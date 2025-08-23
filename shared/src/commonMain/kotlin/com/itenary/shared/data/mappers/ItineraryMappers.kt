@@ -1,87 +1,72 @@
 package com.itenary.shared.data.mappers
 
-import com.itenary.shared.data.dto.*
-import com.itenary.shared.domain.model.*
+import com.itenary.shared.data.models.requests.DayRequestDto
+import com.itenary.shared.data.models.requests.ItineraryRequestDto
+import com.itenary.shared.data.models.responses.MoneyResponse
+import com.itenary.shared.data.models.responses.TimelineItemResponse
+import com.itenary.shared.data.models.responses.TravelFromPrevResponse
+import com.itenary.shared.domain.model.DayRequest
+import com.itenary.shared.domain.model.ExpendEstimation
+import com.itenary.shared.domain.model.FareEstimate
+import com.itenary.shared.domain.model.ItineraryRequest
+import com.itenary.shared.domain.model.Timeline
+import com.itenary.shared.domain.model.TravelFromPrev
 
-fun ItineraryRequest.toDto(): ItineraryRequestDto = ItineraryRequestDto(
-    city = city,
-    province = province,
-    countryCode = countryCode,
-    startDate = startDate,
-    endDate = endDate,
-    language = language
-)
+fun ItineraryRequest.toDto(): ItineraryRequestDto =
+        ItineraryRequestDto(
+                place = place,
+                days = days.map { it.toDto() },
+                language = language,
+                llm = llm
+        )
 
-fun ItineraryResponseDto.toDomain(): Itinerary = Itinerary(
-    result = result.map { it.toDomain() }
-)
+fun DayRequest.toDto(): DayRequestDto =
+        DayRequestDto(day = day, startTime = startTime, endTime = endTime)
 
-fun DayDto.toDomain(): Day = Day(
-    day = day,
-    timeline = timeline.map { it.toDomain() }
-)
+fun ItineraryRequestDto.toDomain(): ItineraryRequest =
+        ItineraryRequest(
+                place = place,
+                days = days.map { it.toDomain() },
+                language = language,
+                llm = llm
+        )
 
-fun TimelineItemDto.toDomain(): TimelineItem = TimelineItem(
-    timeStart = timeStart,
-    timeEnd = timeEnd,
-    destination = destination,
-    shortDescription = shortDescription,
-    longDescription = longDescription,
-    pinpointMapsUrl = pinpointMapsUrl,
-    lat = lat,
-    lng = lng,
-    expendEstimation = expendEstimation.toDomain(),
-    travelFromPrev = travelFromPrev?.toDomain(),
-    stayDurationMin = stayDurationMin,
-    stayDurationMax = stayDurationMax,
-    categories = categories,
-    priceBand = priceBand.toPriceBand(),
-    familyFriendly = familyFriendly,
-    weatherSensitivity = weatherSensitivity.toWeatherSensitivity(),
-    source = source,
-    confidence = confidence
-)
+fun DayRequestDto.toDomain(): DayRequest =
+        DayRequest(day = day, startTime = startTime, endTime = endTime)
 
-fun ExpendEstimationDto.toDomain(): ExpendEstimation = ExpendEstimation(
-    amount = amount,
-    currency = currency
-)
+fun TimelineItemResponse.toDomain(): Timeline =
+        Timeline(
+                timeStart = timeStart,
+                timeEnd = timeEnd,
+                destination = destination,
+                shortDescription = shortDescription,
+                longDescription = longDescription,
+                pinpointMapsUrl = pinpointMapsUrl,
+                lat = lat,
+                lng = lng,
+                expendEstimation = expendEstimation.toDomain(),
+                travelFromPrev = travelFromPrev?.toDomain(),
+                stayDurationMin = stayDurationMin,
+                stayDurationMax = stayDurationMax,
+                categories = categories,
+                priceBand = priceBand,
+                familyFriendly = familyFriendly,
+                weatherSensitivity = weatherSensitivity,
+                source = source,
+                confidence = confidence
+        )
 
-fun TravelFromPrevDto.toDomain(): TravelFromPrev = TravelFromPrev(
-    mode = mode.toTransportMode(),
-    durationMin = durationMin,
-    distanceKm = distanceKm,
-    fareEstimate = fareEstimate?.toDomain(),
-    notes = notes
-)
+fun MoneyResponse.toDomain(): ExpendEstimation =
+        ExpendEstimation(amount = amount, currency = currency)
 
-fun FareEstimateDto.toDomain(): FareEstimate = FareEstimate(
-    amount = amount,
-    currency = currency
-)
+fun TravelFromPrevResponse.toDomain(): TravelFromPrev =
+        TravelFromPrev(
+                mode = mode,
+                durationMin = durationMin,
+                distanceKm = distanceKm,
+                fareEstimate = fareEstimate?.toFareEstimate(),
+                notes = notes
+        )
 
-private fun String.toTransportMode(): TransportMode = when (lowercase()) {
-    "walk" -> TransportMode.Walk
-    "drive" -> TransportMode.Drive
-    "ridehail" -> TransportMode.RideHail
-    "mrt" -> TransportMode.MRT
-    "lrt" -> TransportMode.LRT
-    "bus" -> TransportMode.Bus
-    else -> TransportMode.Unknown(this)
-}
-
-private fun String.toWeatherSensitivity(): WeatherSensitivity = when (lowercase()) {
-    "indoor" -> WeatherSensitivity.Indoor
-    "outdoor" -> WeatherSensitivity.Outdoor
-    "rain-safe", "rainsafe", "rain_safe" -> WeatherSensitivity.RainSafe
-    else -> WeatherSensitivity.Unknown(this)
-}
-
-private fun String.toPriceBand(): PriceBand = when (this) {
-    "$" -> PriceBand.One
-    "$$" -> PriceBand.Two
-    "$$$" -> PriceBand.Three
-    else -> PriceBand.Unknown(this)
-}
-
-
+fun MoneyResponse.toFareEstimate(): FareEstimate =
+        FareEstimate(amount = amount, currency = currency)
