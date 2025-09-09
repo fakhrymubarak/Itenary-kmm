@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    "fwcd.kotlin",
+    "mathiasfrohlich.kotlin",
+    "naco-siren.gradle-languages",
+    "vscjava.vscode-gradle",
+    "ms-vscode.vscode-json",
+    "redhat.vscode-xml",
+    "ms-vscode.vscode-typescript-next"
+  ],
+  "unwantedRecommendations": [
+    "ms-vscode.vscode-typescript"
+  ]
+}

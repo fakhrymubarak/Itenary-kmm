@@ -1,10 +1,9 @@
-package com.fakhry.itenary.ui.dashboard
+package com.fakhry.itenary.features.dashboard.itinerary.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,9 +27,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
@@ -51,6 +47,8 @@ import androidx.compose.ui.unit.dp
 import com.fakhry.itenary.R
 import com.fakhry.itenary.commons.model.DayRequestUiModel
 import com.fakhry.itenary.commons.model.ItineraryRequestUiModel
+import com.fakhry.itenary.features.dashboard.ui.DashboardSideEffect
+import com.fakhry.itenary.features.dashboard.ui.DashboardViewModel
 import com.fakhry.itenary.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
@@ -59,13 +57,12 @@ import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen(
+fun RequestStreamItineraryScreen(
     viewModel: DashboardViewModel = koinViewModel(),
     onNavigateToDetails: (ItineraryRequestUiModel) -> Unit = {},
+
 ) {
-    // Collect state using Orbit MVI
     val state by viewModel.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
 
     // Collect side effects using Orbit MVI
     LaunchedEffect(viewModel) {
@@ -76,88 +73,87 @@ fun DashboardScreen(
                 }
 
                 is DashboardSideEffect.ShowError -> {
-                    snackbarHostState.showSnackbar(sideEffect.message)
+//                    snackbarHostState.showSnackbar(sideEffect.message)
                 }
 
                 is DashboardSideEffect.ShowSuccess -> {
-                    snackbarHostState.showSnackbar(sideEffect.message)
+//                    snackbarHostState.showSnackbar(sideEffect.message)
                 }
             }
         }
     }
 
-    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { paddingValues: PaddingValues ->
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(paddingValues)
+
+    Column(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+    ) {
+        TopAppBar(
+            title = {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_logo_landscape),
+                    contentDescription = "App Logo",
+                )
+            },
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                )
+        )
+
+        // Main Content - Scrollable
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(Spacing.md),
+            verticalArrangement = Arrangement.spacedBy(Spacing.lg)
         ) {
-            TopAppBar(
-                title = {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_logo_landscape),
-                        contentDescription = "App Logo",
-                    )
-                },
-                colors =
-                    TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
-            )
+            item { CarouselSection() }
 
-            // Main Content - Scrollable
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(Spacing.md),
-                verticalArrangement = Arrangement.spacedBy(Spacing.lg)
-            ) {
-                item { CarouselSection() }
+            item {
+                // Location Input
+                LocationInputSection(
+                    place = state.itineraryRequest.place,
+                    onPlaceChange = viewModel::updatePlace,
+                    error = state.validationErrors["place"]
+                )
+            }
 
-                item {
-                    // Location Input
-                    LocationInputSection(
-                        place = state.itineraryRequest.place,
-                        onPlaceChange = viewModel::updatePlace,
-                        error = state.validationErrors["place"]
-                    )
-                }
+            item {
+                // Days Section
+                DaysSection(
+                    days = state.itineraryRequest.days,
+                    onUpdateDayTime = viewModel::updateDayTime,
+                    onAddDay = viewModel::addDay,
+                    onRemoveDay = viewModel::removeDay
+                )
+            }
 
-                item {
-                    // Days Section
-                    DaysSection(
-                        days = state.itineraryRequest.days,
-                        onUpdateDayTime = viewModel::updateDayTime,
-                        onAddDay = viewModel::addDay,
-                        onRemoveDay = viewModel::removeDay
-                    )
-                }
-
-                item {
-                    // Generate Button
-                    Button(
-                        onClick = { viewModel.generateItinerary() },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled =
-                            !state.isLoading &&
-                                    state.itineraryRequest.place.isNotBlank() &&
-                                    state.itineraryRequest.days.isNotEmpty()
-                    ) {
-                        if (state.isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
-                        } else {
-                            Text("Generate Itinerary")
-                        }
+            item {
+                // Generate Button
+                Button(
+                    onClick = { viewModel.generateItinerary() },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled =
+                        !state.isLoading &&
+                            state.itineraryRequest.place.isNotBlank() &&
+                            state.itineraryRequest.days.isNotEmpty()
+                ) {
+                    if (state.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else {
+                        Text("Generate Itinerary")
                     }
                 }
             }
         }
     }
+
 }
 
 @Composable

@@ -1,9 +1,18 @@
-package com.fakhry.itenary.ui.food
+package com.fakhry.itenary.features.dashboard.history.ui
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -12,26 +21,24 @@ import com.fakhry.itenary.theme.Spacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FoodScreen(
+fun HistoryResultsScreen(
     onNavigateBack: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Top App Bar
         TopAppBar(
-            title = { Text("Food & Restaurants") },
+            title = { Text("History") },
             navigationIcon = {
                 IconButton(onClick = onNavigateBack) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back"
                     )
                 }
             }
         )
-        
-        // Content
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -43,11 +50,11 @@ fun FoodScreen(
                 verticalArrangement = Arrangement.spacedBy(Spacing.md)
             ) {
                 Text(
-                    text = "🍽️",
+                    text = "🔖",
                     style = MaterialTheme.typography.displayLarge
                 )
                 Text(
-                    text = "Food & Restaurants",
+                    text = "Bookmarks",
                     style = MaterialTheme.typography.headlineMedium,
                     textAlign = TextAlign.Center
                 )

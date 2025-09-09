@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
@@ -24,6 +25,8 @@ kotlin {
             implementation(libs.coil.compose)
             implementation("org.orbit-mvi:orbit-viewmodel:6.1.0")
             implementation("org.orbit-mvi:orbit-compose:6.1.0")
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.androidx.material.icons.extended)
         }
         commonMain.dependencies {
             implementation(compose.runtime)

@@ -1,4 +1,4 @@
-package com.fakhry.itenary.ui.results
+package com.fakhry.itenary.features.itinerary.results.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,14 +27,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fakhry.itenary.ItineraryViewModel
-import com.fakhry.itenary.navigation.NavigationViewModel
+import com.fakhry.itenary.commons.model.ItineraryRequestUiModel
 import com.fakhry.itenary.theme.Spacing
 import com.itenary.shared.domain.model.StreamingDay
 import com.itenary.shared.domain.model.Timeline
@@ -42,16 +43,18 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ItineraryResultScreen(
+fun ResultStreamItineraryScreen(
+    itineraryRequestUiModel: ItineraryRequestUiModel,
     onNavigateBack: () -> Unit,
-    navViewModel: NavigationViewModel = koinViewModel(),
     viewModel: ItineraryViewModel = koinViewModel(),
 ) {
-    val requestState by navViewModel.itineraryRequestState.collectAsState(null)
-    val state by viewModel.streamingState.collectAsState()
+    // TODO-ASK. CAN I USE ORBIT MVI HERE?
+    LaunchedEffect(Unit) {
+        viewModel.streamItineraryGeneration(itineraryRequestUiModel)
+    }
 
-
-    requestState?.let { viewModel.streamItineraryGeneration(it) }
+    // TODO-ASK. WHAT THE DIFFERENCE BETWEEN THIS AND REGULAR COLLECT
+    val state by viewModel.streamingState.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {

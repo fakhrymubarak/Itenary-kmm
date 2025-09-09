@@ -1,81 +1,51 @@
 package com.fakhry.itenary
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import android.app.Application
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.fakhry.itenary.navigation.NavRoutes
+import com.fakhry.itenary.features.dashboard.navigation.DashboardRoute
+import com.fakhry.itenary.features.dashboard.ui.DashboardViewModel
+import com.fakhry.itenary.navigation.AppNavHost
+import com.fakhry.itenary.navigation.NavigationViewModel
 import com.fakhry.itenary.theme.ItenaryTheme
-import com.fakhry.itenary.ui.bookmarks.BookmarksScreen
-import com.fakhry.itenary.ui.components.ItenaryBottomNavigation
-import com.fakhry.itenary.ui.dashboard.DashboardScreen
-import com.fakhry.itenary.ui.food.FoodScreen
-import com.fakhry.itenary.ui.results.ItineraryResultScreen
+import com.itenary.shared.di.SharedKoinModule
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
+import org.koin.core.logger.Level
+import org.koin.core.module.dsl.viewModelOf
+import org.koin.dsl.module
+
+class ItineraryApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+
+        startKoin {
+            androidContext(this@ItineraryApp)
+            printLogger(Level.DEBUG)
+            modules(
+                SharedKoinModule,
+                module {
+                    viewModelOf(::ItineraryViewModel)
+                    viewModelOf(::DashboardViewModel)
+                    viewModelOf(::NavigationViewModel)
+                }
+            )
+        }
+    }
+}
 
 @Composable
 @Preview
 fun App() {
     ItenaryTheme {
-        val navController = rememberNavController()
-        var currentRoute by remember { mutableStateOf(NavRoutes.DASHBOARD) }
-
-        val currentRouteString = currentRoute.substringBefore('?')
-
-        // Define which routes should show bottom navigation
-        val routesWithBottomNav = setOf(NavRoutes.DASHBOARD, NavRoutes.FOOD, NavRoutes.BOOKMARKS)
-        val showBottomNav = currentRouteString in routesWithBottomNav
-
-        Scaffold(
-            bottomBar = {
-                if (showBottomNav) {
-                    ItenaryBottomNavigation(
-                        currentRoute = currentRoute,
-                        onNavigate = { route ->
-                            navController.navigate(route) {
-                                popUpTo(navController.graph.startDestinationId) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                            currentRoute = route
-                        },
-                    )
-                }
-            },
-        ) { paddingValues ->
-            NavHost(
-                navController = navController,
-                startDestination = NavRoutes.DASHBOARD,
-                modifier = Modifier.padding(paddingValues)
-            ) {
-                composable(NavRoutes.DASHBOARD) {
-                    DashboardScreen(onNavigateToDetails = { itineraryRequest ->
-                        navController.navigate(NavRoutes.ITINERARY_RESULTS)
-                    })
-                }
-                composable(NavRoutes.FOOD) {
-                    FoodScreen(onNavigateBack = { navController.popBackStack() })
-                }
-                composable(NavRoutes.BOOKMARKS) {
-                    BookmarksScreen(onNavigateBack = { navController.popBackStack() })
-                }
-
-                composable(
-                    route = NavRoutes.ITINERARY_RESULTS
-                ) { backStackEntry ->
-
-                    ItineraryResultScreen(
-                        onNavigateBack = { navController.popBackStack() }
-                    )
-                }
-            }
+        Surface(color = MaterialTheme.colorScheme.background) {
+            AppNavHost(
+                navController = rememberNavController(),
+                startDestination = DashboardRoute,
+            )
         }
     }
 }
