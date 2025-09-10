@@ -23,8 +23,8 @@ kotlin {
             implementation(libs.koin.androidx.compose)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.coil.compose)
-            implementation("org.orbit-mvi:orbit-viewmodel:6.1.0")
-            implementation("org.orbit-mvi:orbit-compose:6.1.0")
+            implementation(libs.orbit.viewmodel)
+            implementation(libs.orbit.compose)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.androidx.material.icons.extended)
         }

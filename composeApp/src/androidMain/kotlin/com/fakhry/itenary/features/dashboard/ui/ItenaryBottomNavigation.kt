@@ -5,8 +5,8 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.EggAlt
 import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.EggAlt
-import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.rounded.LocationOn
+import androidx.compose.material.icons.outlined.Map
+import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -34,8 +34,8 @@ sealed class BottomNavItem(
         route = ReqStreamItineraryRoute,
         order = 0,
         title = "Location",
-        iconActive = Icons.Rounded.LocationOn,
-        iconInactive = Icons.Outlined.LocationOn,
+        iconActive = Icons.Rounded.Map,
+        iconInactive = Icons.Outlined.Map,
     )
 
     object Food : BottomNavItem(

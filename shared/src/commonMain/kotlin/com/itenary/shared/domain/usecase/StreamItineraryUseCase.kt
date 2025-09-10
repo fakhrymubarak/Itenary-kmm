@@ -32,6 +32,7 @@ class StreamItineraryUseCase(
             if (day.day <= 0) return AppError.Validation("day number must be positive")
             if (day.startTime.isBlank()) return AppError.Validation("startTime must not be empty")
             if (day.endTime.isBlank()) return AppError.Validation("endTime must not be empty")
+            if (day.pace < 1) return AppError.Validation("pace must not be positive")
         }
 
         return null

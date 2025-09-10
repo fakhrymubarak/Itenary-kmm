@@ -1,7 +1,7 @@
 package com.itenary.shared.domain.model
 
 sealed class StreamingEvent {
-    data class Init(val request: ItineraryRequest) : StreamingEvent()
+    object Init : StreamingEvent()
     data class DayStart(val dayIndex: Int, val dayLabel: String) : StreamingEvent()
     data class TimelineItemAdded(val dayIndex: Int, val item: Timeline) : StreamingEvent()
     data class DayComplete(val dayIndex: Int, val count: Int) : StreamingEvent()

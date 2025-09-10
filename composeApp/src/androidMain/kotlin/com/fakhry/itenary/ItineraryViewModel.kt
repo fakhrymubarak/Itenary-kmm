@@ -117,13 +117,6 @@ class ItineraryViewModel(
             }
         }
     }
-
-    fun clearStreamingItinerary() {
-        _streamingState.value = _streamingState.value.copy(
-            streamingItinerary = null,
-            streamingEvent = null
-        )
-    }
 }
 
 

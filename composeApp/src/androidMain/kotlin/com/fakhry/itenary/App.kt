@@ -8,7 +8,6 @@ import androidx.navigation.compose.rememberNavController
 import com.fakhry.itenary.features.dashboard.navigation.DashboardRoute
 import com.fakhry.itenary.features.dashboard.ui.DashboardViewModel
 import com.fakhry.itenary.navigation.AppNavHost
-import com.fakhry.itenary.navigation.NavigationViewModel
 import com.fakhry.itenary.theme.ItenaryTheme
 import com.itenary.shared.di.SharedKoinModule
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -30,7 +29,6 @@ class ItineraryApp : Application() {
                 module {
                     viewModelOf(::ItineraryViewModel)
                     viewModelOf(::DashboardViewModel)
-                    viewModelOf(::NavigationViewModel)
                 }
             )
         }
