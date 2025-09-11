@@ -37,13 +37,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.fakhry.itenary.theme.ItenaryTheme
 import com.fakhry.itenary.theme.Spacing
-import com.itenary.shared.domain.model.ExpendEstimation
-import com.itenary.shared.domain.model.FareEstimate
-import com.itenary.shared.domain.model.Timeline
-import com.itenary.shared.domain.model.TravelFromPrev
+import com.itenary.shared.domain.model.PriceDomain
+import com.itenary.shared.domain.model.TimelineItemDomain
+import com.itenary.shared.domain.model.TravelToNextDomain
 
 @Composable
-fun TimelineSection(items: MutableList<Timeline>) {
+fun TimelineSection(items: MutableList<TimelineItemDomain>) {
     Column(
         modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(Spacing.md)
     ) {
@@ -52,14 +51,14 @@ fun TimelineSection(items: MutableList<Timeline>) {
 
             // Add travel information between items (except for the last item)
             if (index < items.size - 1) {
-                timeline.travelFromPrev?.let { travel -> TravelInfoCard(travel = travel) }
+                timeline.travelToNextDomain?.let { travel -> TravelInfoCard(travel = travel) }
             }
         }
     }
 }
 
 @Composable
-fun TimelineCard(item: Timeline) {
+fun TimelineCard(item: TimelineItemDomain) {
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
         // Circular icon indicator on the left
         Box(
@@ -105,7 +104,7 @@ fun TimelineCard(item: Timeline) {
                     )
                     Spacer(modifier = Modifier.width(Spacing.xs))
                     Text(
-                        text = item.destination,
+                        text = item.name,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -136,7 +135,7 @@ fun TimelineCard(item: Timeline) {
                     }
 
                     Text(
-                        text = formatPrice(item.expendEstimation),
+                        text = formatPrice(item.expenseEstimation),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.primary
@@ -147,7 +146,7 @@ fun TimelineCard(item: Timeline) {
 
                 // Description
                 Text(
-                    text = item.longDescription,
+                    text = item.shortDesc,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = MaterialTheme.typography.bodyMedium.lineHeight
@@ -191,7 +190,7 @@ fun TimelineCard(item: Timeline) {
 }
 
 @Composable
-fun TravelInfoCard(travel: TravelFromPrev) {
+fun TravelInfoCard(travel: TravelToNextDomain) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -217,27 +216,24 @@ fun TravelInfoCard(travel: TravelFromPrev) {
         Text(
             text = "${travel.durationMin} mins ${travel.mode.lowercase()} (${
                 String.format(
-                    "%.1f", travel.distanceKm
+                    "%.1f", travel.distanceKm.toFloat()
                 )
             } km). ${
-                formatPrice(travel.fareEstimate?.let {
-                    ExpendEstimation(
-                        it.amount, it.currency
-                    )
-                } ?: ExpendEstimation(0.0, "IDR"))
-            }", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                formatPrice(travel.fareEstimate)
+            }", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
-private fun formatPrice(expendEstimation: ExpendEstimation): String {
+private fun formatPrice(priceDomain: PriceDomain): String {
     return when {
-        expendEstimation.amount == 0.0 -> "Free"
-        expendEstimation.amount >= 1000 -> {
-            val amountInK = expendEstimation.amount / 1000
-            "$${String.format("%.0f", amountInK)}.000 ${expendEstimation.currency}"
+        priceDomain.amount == 0 -> "Free"
+        priceDomain.amount >= 1000 -> {
+            val amountInK = priceDomain.amount / 1000
+            "$${String.format("%.0f", amountInK.toFloat())}.000 ${priceDomain.currency}"
         }
 
-        else -> "$${String.format("%.0f", expendEstimation.amount)} ${expendEstimation.currency}"
+        else -> "$${String.format("%.0f", priceDomain.amount.toFloat())} ${priceDomain.currency}"
     }
 }
 
@@ -248,133 +244,98 @@ fun TimelineItemCardPreview() {
         TimelineSection(
             mutableListOf(
                 // Day 1 - Visit Monas
-                Timeline(
+                TimelineItemDomain(
                     timeStart = "09:00",
                     timeEnd = "11:00",
-                    destination = "Visit Monas",
-                    shortDescription = "Explore the National Monument of Indonesia.",
-                    longDescription = "The National Monument (Monas) is a 132m tower in the centre of Merdeka Square, Central Jakarta, symbolizing the fight for Indonesia's independence.",
+                    name = "Visit Monas",
+                    shortDesc = "Explore the National Monument of Indonesia.",
                     pinpointMapsUrl = "https://www.google.com/maps/place/Monas",
-                    lat = -6.1754,
-                    lng = 106.8272,
-                    expendEstimation = ExpendEstimation(amount = 0.0, currency = "IDR"),
-                    travelFromPrev = TravelFromPrev(
-                        mode = "Taxi", durationMin = 20, distanceKm = 10.0, fareEstimate = FareEstimate(
-                            amount = 100000.0, currency = "IDR"
-                        ), notes = "Take a taxi from your hotel to Monas"
+                    lat = -6.1754f,
+                    lng = 106.8272f,
+                    expenseEstimation = PriceDomain(amount = 0, currency = "IDR"),
+                    travelToNextDomain = TravelToNextDomain(
+                        mode = "Taxi", durationMin = 20, distanceKm = 10, fareEstimate = PriceDomain(
+                            amount = 100000, currency = "IDR"
+                        )
                     ),
-                    stayDurationMin = 120,
-                    stayDurationMax = 120,
-                    categories = listOf("Landmark", "Historical Site"),
-                    priceBand = "Free",
-                    familyFriendly = true,
-                    weatherSensitivity = "Low",
                     source = "LLM",
-                    confidence = 95.0
+                    confidence = 95
                 ),
 
                 // Day 1 - Lunch at Cafe Batavia
-                Timeline(
+                TimelineItemDomain(
                     timeStart = "11:30",
                     timeEnd = "13:00",
-                    destination = "Lunch at Cafe Batavia",
-                    shortDescription = "Enjoy traditional Indonesian cuisine.",
-                    longDescription = "Cafe Batavia is a historic restaurant in Jakarta's old town, known for its colonial architecture and authentic Indonesian dishes.",
+                    name = "Lunch at Cafe Batavia",
+                    shortDesc = "Enjoy traditional Indonesian cuisine.",
                     pinpointMapsUrl = "https://www.google.com/maps/place/Cafe+Batavia",
-                    lat = -6.1374,
-                    lng = 106.8281,
-                    expendEstimation = ExpendEstimation(amount = 200000.0, currency = "IDR"),
-                    travelFromPrev = TravelFromPrev(
-                        mode = "Walk", durationMin = 15, distanceKm = 1.0, fareEstimate = FareEstimate(
-                            amount = 0.0, currency = "IDR"
-                        ), notes = "Short walk from Monas to Cafe Batavia"
+                    lat = -6.1374f,
+                    lng = 106.8281f,
+                    expenseEstimation = PriceDomain(amount = 200000, currency = "IDR"),
+                    travelToNextDomain = TravelToNextDomain(
+                        mode = "Walk", durationMin = 15, distanceKm = 1, fareEstimate = PriceDomain(
+                            amount = 0, currency = "IDR"
+                        )
                     ),
-                    stayDurationMin = 90,
-                    stayDurationMax = 90,
-                    categories = listOf("Restaurant", "Indonesian Cuisine"),
-                    priceBand = "Medium",
-                    familyFriendly = true,
-                    weatherSensitivity = "Low",
                     source = "LLM",
-                    confidence = 90.0
+                    confidence = 90
                 ),
 
                 // Day 1 - Explore Kota Tua
-                Timeline(
+                TimelineItemDomain(
                     timeStart = "13:15",
                     timeEnd = "16:00",
-                    destination = "Explore Kota Tua",
-                    shortDescription = "Wander through the old town of Jakarta.",
-                    longDescription = "Kota Tua (Old Town) is a historic area in Jakarta featuring Dutch colonial architecture, museums, and cultural sites.",
+                    name = "Explore Kota Tua",
+                    shortDesc = "Wander through the old town of Jakarta.",
                     pinpointMapsUrl = "https://www.google.com/maps/place/Kota+Tua",
-                    lat = -6.1374,
-                    lng = 106.8281,
-                    expendEstimation = ExpendEstimation(amount = 0.0, currency = "IDR"),
-                    travelFromPrev = TravelFromPrev(
-                        mode = "Taxi", durationMin = 25, distanceKm = 12.0, fareEstimate = FareEstimate(
-                            amount = 120000.0, currency = "IDR"
-                        ), notes = "Take a taxi to explore different parts of Kota Tua"
+                    lat = -6.1374f,
+                    lng = 106.8281f,
+                    expenseEstimation = PriceDomain(amount = 0, currency = "IDR"),
+                    travelToNextDomain = TravelToNextDomain(
+                        mode = "Taxi", durationMin = 25, distanceKm = 12, fareEstimate = PriceDomain(
+                            amount = 120000, currency = "IDR"
+                        )
                     ),
-                    stayDurationMin = 165,
-                    stayDurationMax = 165,
-                    categories = listOf("Historical Site", "Cultural", "Walking Tour"),
-                    priceBand = "Free",
-                    familyFriendly = true,
-                    weatherSensitivity = "Medium",
                     source = "LLM",
-                    confidence = 92.0
+                    confidence = 92
                 ),
 
                 // Day 2 - Visit Istiqlal Mosque
-                Timeline(
+                TimelineItemDomain(
                     timeStart = "09:00",
                     timeEnd = "10:30",
-                    destination = "Visit Istiqlal Mosque",
-                    shortDescription = "Explore one of the largest mosques in Southeast Asia.",
-                    longDescription = "Istiqlal Mosque is the largest mosque in Southeast Asia and the third largest Sunni mosque in terms of capacity.",
+                    name = "Visit Istiqlal Mosque",
+                    shortDesc = "Explore one of the largest mosques in Southeast Asia.",
                     pinpointMapsUrl = "https://www.google.com/maps/place/Istiqlal+Mosque",
-                    lat = -6.1754,
-                    lng = 106.8272,
-                    expendEstimation = ExpendEstimation(amount = 0.0, currency = "IDR"),
-                    travelFromPrev = TravelFromPrev(
-                        mode = "Walk", durationMin = 10, distanceKm = 0.5, fareEstimate = FareEstimate(
-                            amount = 0.0, currency = "IDR"
-                        ), notes = "Short walk from the hotel to the mosque"
+                    lat = -6.1754f,
+                    lng = 106.8272f,
+                    expenseEstimation = PriceDomain(amount = 0, currency = "IDR"),
+                    travelToNextDomain = TravelToNextDomain(
+                        mode = "Walk", durationMin = 10, distanceKm = 1, fareEstimate = PriceDomain(
+                            amount = 0, currency = "IDR"
+                        )
                     ),
-                    stayDurationMin = 90,
-                    stayDurationMax = 90,
-                    categories = listOf("Religious Site", "Architecture"),
-                    priceBand = "Free",
-                    familyFriendly = true,
-                    weatherSensitivity = "Low",
                     source = "LLM",
-                    confidence = 96.0
+                    confidence = 96
                 ),
 
                 // Day 3 - Visit Taman Mini Indonesia Indah
-                Timeline(
+                TimelineItemDomain(
                     timeStart = "09:00",
                     timeEnd = "14:00",
-                    destination = "Visit Taman Mini Indonesia Indah",
-                    shortDescription = "Explore Indonesia in miniature.",
-                    longDescription = "Taman Mini Indonesia Indah (Beautiful Indonesia Miniature Park) showcases the cultural diversity of Indonesia's provinces.",
+                    name = "Visit Taman Mini Indonesia Indah",
+                    shortDesc = "Explore Indonesia in miniature.",
                     pinpointMapsUrl = "https://www.google.com/maps/place/Taman+Mini+Indonesia+Indah",
-                    lat = -6.3000,
-                    lng = 106.8667,
-                    expendEstimation = ExpendEstimation(amount = 200000.0, currency = "IDR"),
-                    travelFromPrev = TravelFromPrev(
-                        mode = "Taxi", durationMin = 45, distanceKm = 20.0, fareEstimate = FareEstimate(
-                            amount = 200000.0, currency = "IDR"
-                        ), notes = "Take a taxi to Taman Mini Indonesia Indah"
+                    lat = -6.3000f,
+                    lng = 106.8667f,
+                    expenseEstimation = PriceDomain(amount = 200000, currency = "IDR"),
+                    travelToNextDomain = TravelToNextDomain(
+                        mode = "Taxi", durationMin = 45, distanceKm = 20, fareEstimate = PriceDomain(
+                            amount = 200000, currency = "IDR"
+                        )
                     ),
-                    stayDurationMin = 300,
-                    stayDurationMax = 300,
-                    categories = listOf("Theme Park", "Cultural", "Family"),
-                    priceBand = "Medium",
-                    familyFriendly = true,
-                    weatherSensitivity = "High",
                     source = "LLM",
-                    confidence = 95.0
+                    confidence = 95
                 )
             )
         )
@@ -385,29 +346,22 @@ fun TimelineItemCardPreview() {
 @Preview
 fun TimelineCardPreview() {
     ItenaryTheme {
-        val timeline = Timeline(
+        val timeline = TimelineItemDomain(
             timeStart = "09:00",
             timeEnd = "11:00",
-            destination = "Visit Monas",
-            shortDescription = "Explore the National Monument of Indonesia.",
-            longDescription = "The National Monument (Monas) is a 132m tower in the centre of Merdeka Square, Central Jakarta, symbolizing the fight for Indonesia's independence.",
+            name = "Visit Monas",
+            shortDesc = "Explore the National Monument of Indonesia.",
             pinpointMapsUrl = "https://www.google.com/maps/place/Monas",
-            lat = -6.1754,
-            lng = 106.8272,
-            expendEstimation = ExpendEstimation(amount = 0.0, currency = "IDR"),
-            travelFromPrev = TravelFromPrev(
-                mode = "Taxi", durationMin = 20, distanceKm = 10.0, fareEstimate = FareEstimate(
-                    amount = 100000.0, currency = "IDR"
-                ), notes = "Take a taxi from your hotel to Monas"
+            lat = -6.1754f,
+            lng = 106.8272f,
+            expenseEstimation = PriceDomain(amount = 0, currency = "IDR"),
+            travelToNextDomain = TravelToNextDomain(
+                mode = "Taxi", durationMin = 20, distanceKm = 10, fareEstimate = PriceDomain(
+                    amount = 100000, currency = "IDR"
+                )
             ),
-            stayDurationMin = 120,
-            stayDurationMax = 120,
-            categories = listOf("Landmark", "Historical Site"),
-            priceBand = "Free",
-            familyFriendly = true,
-            weatherSensitivity = "Low",
             source = "LLM",
-            confidence = 95.0
+            confidence = 95
         )
         TimelineCard(timeline)
     }

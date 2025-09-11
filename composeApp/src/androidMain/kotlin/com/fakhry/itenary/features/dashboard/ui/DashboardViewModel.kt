@@ -15,8 +15,11 @@ enum class ValidationPlaceResult {
 }
 
 data class DashboardState(
-    val itineraryRequest: ItineraryRequestUiModel = ItineraryRequestUiModel(days = listOf(DayRequestUiModel())),
-    val validationPlaceResult: ValidationPlaceResult = ValidationPlaceResult.INIT,
+    val itineraryRequest: ItineraryRequestUiModel = ItineraryRequestUiModel(
+        place = "Makassar",
+        days = listOf(DayRequestUiModel())
+    ),
+    val validationPlaceResult: ValidationPlaceResult = ValidationPlaceResult.VALID,
 )
 
 sealed class DashboardSideEffect {
