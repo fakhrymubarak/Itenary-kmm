@@ -45,6 +45,7 @@ class ItineraryViewModel(
             // try catch catch potential parsing errors
             try {
                 streamItineraryUseCase(itineraryRequest).collect { event ->
+                    println("Trace event $event")
                     when (event) {
                         is StreamingEvent.Init -> {}
                         is StreamingEvent.DayStart -> {

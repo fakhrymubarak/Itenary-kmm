@@ -55,6 +55,7 @@ fun ResultStreamItineraryScreen(
     // TODO-ASK. WHAT THE DIFFERENCE BETWEEN THIS AND REGULAR COLLECT
     val state by viewModel.streamingState.collectAsStateWithLifecycle()
 
+    println("Trace $state")
     Scaffold(
         topBar = {
             TopAppBar(
@@ -95,7 +96,7 @@ fun ResultStreamItineraryScreen(
                     }
                 }
 
-                state.streamingItinerary != null -> {
+                state.streamingItinerary.days.isNotEmpty() -> {
                     // Streaming results
                     LazyColumn(
                         modifier = Modifier
@@ -103,36 +104,33 @@ fun ResultStreamItineraryScreen(
                             .padding(Spacing.md),
                         verticalArrangement = Arrangement.spacedBy(Spacing.md)
                     ) {
-                        // Show streaming days
                         val streamingItinerary = state.streamingItinerary
-                        if (streamingItinerary != null) {
-                            items(streamingItinerary.days) { day ->
-                                DayCard(day = day)
-                            }
+                        items(streamingItinerary.days) { day ->
+                            DayCard(day = day)
+                        }
 
-                            // Show completion status
-                            if (streamingItinerary.isComplete) {
-                                item {
-                                    Card(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = MaterialTheme.colorScheme.secondaryContainer
-                                        )
+                        // Show completion status
+                        if (streamingItinerary.isComplete) {
+                            item {
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                                    )
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(Spacing.md)
                                     ) {
-                                        Column(
-                                            modifier = Modifier.padding(Spacing.md)
-                                        ) {
-                                            Text(
-                                                text = "✅ Itinerary Complete!",
-                                                style = MaterialTheme.typography.headlineSmall,
-                                                fontWeight = FontWeight.Bold
-                                            )
-                                            Spacer(modifier = Modifier.height(Spacing.sm))
-                                            Text(
-                                                text = "Your personalized itinerary is ready. You can now plan your trip!",
-                                                style = MaterialTheme.typography.bodyMedium
-                                            )
-                                        }
+                                        Text(
+                                            text = "✅ Itinerary Complete!",
+                                            style = MaterialTheme.typography.headlineSmall,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Spacer(modifier = Modifier.height(Spacing.sm))
+                                        Text(
+                                            text = "Your personalized itinerary is ready. You can now plan your trip!",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
                                     }
                                 }
                             }
@@ -176,6 +174,7 @@ fun ResultStreamItineraryScreen(
 private fun DayCard(
     day: StreamingDay,
 ) {
+    println("Trace day $day")
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp)
@@ -211,7 +210,7 @@ private fun DayCard(
             Spacer(modifier = Modifier.height(Spacing.sm))
 
             // Show timeline items
-            TimelineItemCard(item = day.items)
+            TimelineSection(items = day.items)
 
             if (day.items.isEmpty() && !day.isComplete) {
                 Text(

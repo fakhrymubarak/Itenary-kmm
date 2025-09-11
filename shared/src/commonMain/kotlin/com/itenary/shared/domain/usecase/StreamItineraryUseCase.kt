@@ -17,8 +17,10 @@ class StreamItineraryUseCase(
             return@flow
         }
 
-        streamApi.streamItineraryGeneration(request)
-            .collect { streamingEvent -> emit(streamingEvent) }
+        streamApi.streamItineraryGeneration(request).collect { streamingEvent ->
+            println("Trace StreamItineraryUseCase event $streamingEvent")
+            emit(streamingEvent)
+        }
     }
 
     private fun validateRequest(request: ItineraryRequest): AppError.Validation? {
