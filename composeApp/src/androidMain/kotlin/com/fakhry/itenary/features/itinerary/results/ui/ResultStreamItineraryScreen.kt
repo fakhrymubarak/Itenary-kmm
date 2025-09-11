@@ -38,7 +38,6 @@ import com.fakhry.itenary.ItineraryViewModel
 import com.fakhry.itenary.commons.model.ItineraryRequestUiModel
 import com.fakhry.itenary.theme.Spacing
 import com.itenary.shared.domain.model.StreamingDay
-import com.itenary.shared.domain.model.Timeline
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -212,10 +211,7 @@ private fun DayCard(
             Spacer(modifier = Modifier.height(Spacing.sm))
 
             // Show timeline items
-            day.items.forEach { item ->
-                TimelineItemCard(item = item)
-                Spacer(modifier = Modifier.height(Spacing.xs))
-            }
+            TimelineItemCard(item = day.items)
 
             if (day.items.isEmpty() && !day.isComplete) {
                 Text(
@@ -228,7 +224,3 @@ private fun DayCard(
     }
 }
 
-@Composable
-fun TimelineItemCard(item: Timeline) {
-    TODO("Not yet implemented")
-}
