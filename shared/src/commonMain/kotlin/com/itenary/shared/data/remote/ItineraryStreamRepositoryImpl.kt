@@ -27,21 +27,18 @@ class ItineraryStreamRepositoryImpl(
         request: ItineraryRequest,
     ): Flow<StreamingEvent> = flow {
         try {
-            httpClient.sse(request = {
-                method = HttpMethod.Post
-                url("$baseUrl/sse/generate-itinerary")
-                contentType(ContentType.Application.Json)
-                setBody(request.toDto())
-            }) {
-
-                incoming
-                    .map { sseEventMapper.mapToStreamingEvent(it) }
-                    .collect { event ->
-                        println("Trace streamingEvent $event")
-//                        emit(event)
-                    }
+            httpClient.sse(
+                request = {
+                    method = HttpMethod.Post
+                    url("$baseUrl/sse/generate-itinerary")
+                    contentType(ContentType.Application.Json)
+                    setBody(request.toDto())
+                }
+            ) {
+                incoming.map { sseEventMapper.mapToStreamingEvent(it) }.collect { event ->
+                    emit(event)
+                }
             }
-
         } catch (e: Exception) {
             emit(StreamingEvent.Error("Streaming failed: ${e.message}"))
         }

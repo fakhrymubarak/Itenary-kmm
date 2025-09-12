@@ -18,7 +18,6 @@ class StreamItineraryUseCase(
         }
 
         streamApi.streamItineraryGeneration(request).collect { streamingEvent ->
-            println("Trace StreamItineraryUseCase event $streamingEvent")
             emit(streamingEvent)
         }
     }

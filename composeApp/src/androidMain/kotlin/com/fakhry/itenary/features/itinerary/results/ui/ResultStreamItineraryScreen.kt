@@ -51,9 +51,9 @@ fun ResultStreamItineraryScreen(
     LaunchedEffect(Unit) { viewModel.streamItineraryGeneration(itineraryRequestUiModel) }
 
     // TODO-ASK. WHAT THE DIFFERENCE BETWEEN THIS AND REGULAR COLLECT
-    val state by viewModel.streamingUiState.collectAsStateWithLifecycle()
-
-    println("Trace $state")
+    val state by viewModel.streamingUiState.collectAsStateWithLifecycle(
+        initialValue = viewModel.latestState
+    )
     Scaffold(
         topBar = {
             TopAppBar(
@@ -171,7 +171,6 @@ fun ResultStreamItineraryScreen(
 private fun DayCard(
     day: StreamingDayUiModel,
 ) {
-    println("Trace day $day")
     Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
         Column(modifier = Modifier.padding(Spacing.md)) {
             Row(

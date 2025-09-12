@@ -8,15 +8,3 @@ sealed class StreamingEvent {
     object Complete : StreamingEvent()
     data class Error(val message: String) : StreamingEvent()
 }
-
-data class StreamingItinerary(
-    val days: MutableList<StreamingDay> = mutableListOf(),
-    val isComplete: Boolean = false
-)
-
-data class StreamingDay(
-    val dayIndex: Int,
-    val dayLabel: String,
-    val items: MutableList<TimelineItemDomain> = mutableListOf(),
-    val isComplete: Boolean = false,
-)
