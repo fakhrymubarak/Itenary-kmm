@@ -14,11 +14,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.DirectionsWalk
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.AccountBalance
-import androidx.compose.material.icons.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.outlined.LocalTaxi
+import androidx.compose.material.icons.outlined.PedalBike
+import androidx.compose.material.icons.rounded.CarCrash
+import androidx.compose.material.icons.rounded.ElectricBike
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,32 +39,33 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.fakhry.itenary.features.itinerary.results.model.TimelineItemUiModel
+import com.fakhry.itenary.features.itinerary.results.model.TravelFromPrevUiModel
+import com.fakhry.itenary.features.itinerary.results.model.toUiModel
 import com.fakhry.itenary.theme.ItenaryTheme
 import com.fakhry.itenary.theme.Spacing
 import com.itenary.shared.domain.model.PriceDomain
 import com.itenary.shared.domain.model.TimelineItemDomain
-import com.itenary.shared.domain.model.TravelToNextDomain
+import com.itenary.shared.domain.model.TravelFromPrevDomain
+import com.itenary.shared.domain.model.TravelMode
 
 @Composable
-fun TimelineSection(items: MutableList<TimelineItemDomain>) {
+fun TimelineSection(items: MutableList<TimelineItemUiModel>) {
     Column(
         modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(Spacing.md)
     ) {
         items.forEachIndexed { index, timeline ->
-            TimelineCard(item = timeline)
-
-            // Add travel information between items (except for the last item)
-            if (index < items.size - 1) {
-                timeline.travelToNextDomain?.let { travel -> TravelInfoCard(travel = travel) }
+            if (timeline.travelFromPrev.mode != TravelMode.DEFAULT) {
+                TravelInfoCard(travel = timeline.travelFromPrev)
             }
+            TimelineCard(item = timeline)
         }
     }
 }
 
 @Composable
-fun TimelineCard(item: TimelineItemDomain) {
-    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-        // Circular icon indicator on the left
+fun TimelineCard(item: TimelineItemUiModel) {
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Box(
             modifier = Modifier
                 .size(24.dp)
@@ -135,7 +140,7 @@ fun TimelineCard(item: TimelineItemDomain) {
                     }
 
                     Text(
-                        text = formatPrice(item.expenseEstimation),
+                        text = item.expenseEstimation,
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.primary
@@ -162,9 +167,7 @@ fun TimelineCard(item: TimelineItemDomain) {
                 ) {
                     // Progress indicator (circular line)
                     CircularProgressIndicator(
-                        progress = {
-                            item.confidence.toFloat() / 100
-                        },
+                        progress = { item.confidence.toFloat() / 100 },
                         modifier = Modifier.size(16.dp),
                         color = MaterialTheme.colorScheme.primary,
                         strokeWidth = 2.dp,
@@ -190,7 +193,7 @@ fun TimelineCard(item: TimelineItemDomain) {
 }
 
 @Composable
-fun TravelInfoCard(travel: TravelToNextDomain) {
+fun TravelInfoCard(travel: TravelFromPrevUiModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -198,9 +201,14 @@ fun TravelInfoCard(travel: TravelToNextDomain) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Travel mode icon
-        val travelIcon = when (travel.mode.lowercase()) {
-            "walk" -> Icons.Default.DirectionsWalk
-            else -> Icons.Default.DirectionsWalk // Default to walk icon
+        val travelIcon = when (travel.mode) {
+            TravelMode.WALK -> Icons.AutoMirrored.Outlined.DirectionsWalk
+            TravelMode.TAXI -> Icons.Outlined.LocalTaxi
+            TravelMode.BIKE -> Icons.Outlined.PedalBike
+            TravelMode.CAR -> Icons.Rounded.CarCrash
+            TravelMode.RIDE_HAILING -> Icons.Rounded.ElectricBike
+            TravelMode.OTHERS -> Icons.AutoMirrored.Outlined.DirectionsWalk
+            TravelMode.DEFAULT -> Icons.AutoMirrored.Outlined.DirectionsWalk
         }
 
         Icon(
@@ -214,26 +222,10 @@ fun TravelInfoCard(travel: TravelToNextDomain) {
 
         // Travel information text
         Text(
-            text = "${travel.durationMin} mins ${travel.mode.lowercase()} (${
-                String.format(
-                    "%.1f", travel.distanceKm.toFloat()
-                )
-            } km). ${
-                formatPrice(travel.fareEstimate)
-            }", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
+            text = travel.travelToNextInfo,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-    }
-}
-
-private fun formatPrice(priceDomain: PriceDomain): String {
-    return when {
-        priceDomain.amount == 0 -> "Free"
-        priceDomain.amount >= 1000 -> {
-            val amountInK = priceDomain.amount / 1000
-            "$${String.format("%.0f", amountInK.toFloat())}.000 ${priceDomain.currency}"
-        }
-
-        else -> "$${String.format("%.0f", priceDomain.amount.toFloat())} ${priceDomain.currency}"
     }
 }
 
@@ -253,14 +245,10 @@ fun TimelineItemCardPreview() {
                     lat = -6.1754f,
                     lng = 106.8272f,
                     expenseEstimation = PriceDomain(amount = 0, currency = "IDR"),
-                    travelToNextDomain = TravelToNextDomain(
-                        mode = "Taxi", durationMin = 20, distanceKm = 10, fareEstimate = PriceDomain(
-                            amount = 100000, currency = "IDR"
-                        )
-                    ),
+                    travelFromPrev = TravelFromPrevDomain(),
                     source = "LLM",
                     confidence = 95
-                ),
+                ).toUiModel(),
 
                 // Day 1 - Lunch at Cafe Batavia
                 TimelineItemDomain(
@@ -272,14 +260,18 @@ fun TimelineItemCardPreview() {
                     lat = -6.1374f,
                     lng = 106.8281f,
                     expenseEstimation = PriceDomain(amount = 200000, currency = "IDR"),
-                    travelToNextDomain = TravelToNextDomain(
-                        mode = "Walk", durationMin = 15, distanceKm = 1, fareEstimate = PriceDomain(
+                    travelFromPrev = TravelFromPrevDomain(
+                        mode = TravelMode.WALK,
+                        modeStr = "Walk",
+                        durationMin = 15,
+                        distanceKm = 1f,
+                        fareEstimate = PriceDomain(
                             amount = 0, currency = "IDR"
                         )
                     ),
                     source = "LLM",
                     confidence = 90
-                ),
+                ).toUiModel(),
 
                 // Day 1 - Explore Kota Tua
                 TimelineItemDomain(
@@ -291,14 +283,18 @@ fun TimelineItemCardPreview() {
                     lat = -6.1374f,
                     lng = 106.8281f,
                     expenseEstimation = PriceDomain(amount = 0, currency = "IDR"),
-                    travelToNextDomain = TravelToNextDomain(
-                        mode = "Taxi", durationMin = 25, distanceKm = 12, fareEstimate = PriceDomain(
+                    travelFromPrev = TravelFromPrevDomain(
+                        mode = TravelMode.TAXI,
+                        modeStr = "Taxi",
+                        durationMin = 25,
+                        distanceKm = 12f,
+                        fareEstimate = PriceDomain(
                             amount = 120000, currency = "IDR"
                         )
                     ),
                     source = "LLM",
                     confidence = 92
-                ),
+                ).toUiModel(),
 
                 // Day 2 - Visit Istiqlal Mosque
                 TimelineItemDomain(
@@ -310,14 +306,18 @@ fun TimelineItemCardPreview() {
                     lat = -6.1754f,
                     lng = 106.8272f,
                     expenseEstimation = PriceDomain(amount = 0, currency = "IDR"),
-                    travelToNextDomain = TravelToNextDomain(
-                        mode = "Walk", durationMin = 10, distanceKm = 1, fareEstimate = PriceDomain(
+                    travelFromPrev = TravelFromPrevDomain(
+                        mode = TravelMode.WALK,
+                        modeStr = "Walk",
+                        durationMin = 10,
+                        distanceKm = 1f,
+                        fareEstimate = PriceDomain(
                             amount = 0, currency = "IDR"
                         )
                     ),
                     source = "LLM",
                     confidence = 96
-                ),
+                ).toUiModel(),
 
                 // Day 3 - Visit Taman Mini Indonesia Indah
                 TimelineItemDomain(
@@ -329,14 +329,18 @@ fun TimelineItemCardPreview() {
                     lat = -6.3000f,
                     lng = 106.8667f,
                     expenseEstimation = PriceDomain(amount = 200000, currency = "IDR"),
-                    travelToNextDomain = TravelToNextDomain(
-                        mode = "Taxi", durationMin = 45, distanceKm = 20, fareEstimate = PriceDomain(
+                    travelFromPrev = TravelFromPrevDomain(
+                        mode = TravelMode.TAXI,
+                        modeStr = "Taxi",
+                        durationMin = 45,
+                        distanceKm = 20f,
+                        fareEstimate = PriceDomain(
                             amount = 200000, currency = "IDR"
                         )
                     ),
                     source = "LLM",
                     confidence = 95
-                )
+                ).toUiModel()
             )
         )
     }
@@ -355,15 +359,18 @@ fun TimelineCardPreview() {
             lat = -6.1754f,
             lng = 106.8272f,
             expenseEstimation = PriceDomain(amount = 0, currency = "IDR"),
-            travelToNextDomain = TravelToNextDomain(
-                mode = "Taxi", durationMin = 20, distanceKm = 10, fareEstimate = PriceDomain(
+            travelFromPrev = TravelFromPrevDomain(
+                mode = TravelMode.TAXI,
+                modeStr = "Taxi",
+                durationMin = 20,
+                distanceKm = 10f,
+                fareEstimate = PriceDomain(
                     amount = 100000, currency = "IDR"
                 )
             ),
             source = "LLM",
             confidence = 95
-        )
+        ).toUiModel()
         TimelineCard(timeline)
     }
-
 }

@@ -35,9 +35,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fakhry.itenary.ItineraryViewModel
+import com.fakhry.itenary.StreamingDayUiModel
 import com.fakhry.itenary.commons.model.ItineraryRequestUiModel
 import com.fakhry.itenary.theme.Spacing
-import com.itenary.shared.domain.model.StreamingDay
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,12 +48,10 @@ fun ResultStreamItineraryScreen(
     viewModel: ItineraryViewModel = koinViewModel(),
 ) {
     // TODO-ASK. CAN I USE ORBIT MVI HERE?
-    LaunchedEffect(Unit) {
-        viewModel.streamItineraryGeneration(itineraryRequestUiModel)
-    }
+    LaunchedEffect(Unit) { viewModel.streamItineraryGeneration(itineraryRequestUiModel) }
 
     // TODO-ASK. WHAT THE DIFFERENCE BETWEEN THIS AND REGULAR COLLECT
-    val state by viewModel.streamingState.collectAsStateWithLifecycle()
+    val state by viewModel.streamingUiState.collectAsStateWithLifecycle()
 
     println("Trace $state")
     Scaffold(
@@ -68,9 +66,10 @@ fun ResultStreamItineraryScreen(
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
             )
         }
     ) { paddingValues ->
@@ -105,22 +104,21 @@ fun ResultStreamItineraryScreen(
                         verticalArrangement = Arrangement.spacedBy(Spacing.md)
                     ) {
                         val streamingItinerary = state.streamingItinerary
-                        items(streamingItinerary.days) { day ->
-                            DayCard(day = day)
-                        }
+                        items(streamingItinerary.days) { day -> DayCard(day = day) }
 
                         // Show completion status
                         if (streamingItinerary.isComplete) {
                             item {
                                 Card(
                                     modifier = Modifier.fillMaxWidth(),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                                    )
+                                    colors =
+                                        CardDefaults.cardColors(
+                                            containerColor =
+                                                MaterialTheme.colorScheme
+                                                    .secondaryContainer
+                                        )
                                 ) {
-                                    Column(
-                                        modifier = Modifier.padding(Spacing.md)
-                                    ) {
+                                    Column(modifier = Modifier.padding(Spacing.md)) {
                                         Text(
                                             text = "✅ Itinerary Complete!",
                                             style = MaterialTheme.typography.headlineSmall,
@@ -128,7 +126,8 @@ fun ResultStreamItineraryScreen(
                                         )
                                         Spacer(modifier = Modifier.height(Spacing.sm))
                                         Text(
-                                            text = "Your personalized itinerary is ready. You can now plan your trip!",
+                                            text =
+                                                "Your personalized itinerary is ready. You can now plan your trip!",
                                             style = MaterialTheme.typography.bodyMedium
                                         )
                                     }
@@ -158,9 +157,7 @@ fun ResultStreamItineraryScreen(
                             style = MaterialTheme.typography.bodyLarge
                         )
                         Spacer(modifier = Modifier.height(Spacing.lg))
-                        Button(onClick = onNavigateBack) {
-                            Text("Go Back")
-                        }
+                        Button(onClick = onNavigateBack) { Text("Go Back") }
                     }
                 }
 
@@ -172,16 +169,11 @@ fun ResultStreamItineraryScreen(
 
 @Composable
 private fun DayCard(
-    day: StreamingDay,
+    day: StreamingDayUiModel,
 ) {
     println("Trace day $day")
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(Spacing.md)
-        ) {
+    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {
+        Column(modifier = Modifier.padding(Spacing.md)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -222,4 +214,3 @@ private fun DayCard(
         }
     }
 }
-

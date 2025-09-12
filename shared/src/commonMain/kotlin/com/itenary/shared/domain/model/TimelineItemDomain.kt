@@ -10,7 +10,7 @@ data class TimelineItemDomain(
     val name: String = "",
     val shortDesc: String = "",
     val category: String = "",
-    val travelToNextDomain: TravelToNextDomain = TravelToNextDomain(),
+    val travelFromPrev: TravelFromPrevDomain = TravelFromPrevDomain(),
     val source: String = "",
     val confidence: Int = 0,
 )
@@ -20,9 +20,14 @@ data class PriceDomain(
     val currency: String = "",
 )
 
-data class TravelToNextDomain(
-    val mode: String = "",
+data class TravelFromPrevDomain(
+    val mode: TravelMode = TravelMode.DEFAULT,
+    val modeStr: String = "",
     val fareEstimate: PriceDomain = PriceDomain(),
-    val distanceKm: Int = 0,
+    val distanceKm: Float = 0f,
     val durationMin: Int = 0,
 )
+
+enum class TravelMode {
+    WALK, TAXI, BIKE, CAR, RIDE_HAILING, OTHERS, DEFAULT
+}
