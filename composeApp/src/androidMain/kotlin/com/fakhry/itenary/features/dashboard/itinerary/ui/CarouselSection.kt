@@ -1,119 +1,175 @@
 package com.fakhry.itenary.features.dashboard.itinerary.ui
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.fakhry.itenary.R
+import coil.compose.AsyncImage
+import com.fakhry.itenary.commons.ui.DotsIndicator
+import com.fakhry.itenary.commons.ui.ShimmerBox
+import com.fakhry.itenary.commons.ui.ShimmerCircle
+import com.fakhry.itenary.features.dashboard.ui.UiState
 import com.fakhry.itenary.theme.Spacing
-import kotlinx.coroutines.delay
-import kotlin.math.roundToInt
+import com.itenary.shared.domain.model.BannerDomain
+import com.valentinilk.shimmer.shimmer
 
 @Composable
-fun CarouselSection() {
-    val carouselImages = listOf(
-        R.drawable.ic_launcher_background, // Using launcher as placeholder
-        R.drawable.ic_launcher_background, R.drawable.ic_launcher_background
-    )
-
-    var currentIndex by remember { mutableIntStateOf(0) }
-    var offsetX by remember { mutableFloatStateOf(0f) }
-    var isDragging by remember { mutableIntStateOf(0) }
-
-    // Auto-advance only when not dragging
-    LaunchedEffect(currentIndex, isDragging) {
-        if (isDragging == 0) {
-            delay(3000)
-            currentIndex = (currentIndex + 1) % carouselImages.size
+fun CarouselSection(
+    modifier: Modifier = Modifier,
+    state: UiState<List<BannerDomain>>,
+    onClickBanner: (String) -> Unit = {},
+    onRetrySection: () -> Unit = {},
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .aspectRatio(786f / 336f),
+        contentAlignment = Alignment.Center,
+    ) {
+        when (state) {
+            UiState.Loading -> ShimmerBannerSection()
+            is UiState.Error -> ErrorBannerSection(false, onRetrySection)
+            UiState.NetworkError -> ErrorBannerSection(true, onRetrySection)
+            is UiState.Success -> BannerCarousel(state.data, onClickBanner)
         }
     }
+}
 
-    // Animate offset when not dragging
-    val animatedOffsetX by animateFloatAsState(
-        targetValue = if (isDragging == 0) 0f else offsetX,
-        animationSpec = tween(durationMillis = 300),
-        label = "offsetX"
-    )
+@Composable
+fun BannerCarousel(banners: List<BannerDomain>, onClickBanner: (String) -> Unit) {
+    val pagerState = rememberPagerState(pageCount = { banners.size })
 
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(393f / 168f)
-            .clip(RoundedCornerShape(12.dp))
-            .pointerInput(Unit) {
-                detectDragGestures(onDragStart = { isDragging = 1 }, onDragEnd = {
-                    isDragging = 0
-                    val threshold = size.width * 0.3f
-                    when {
-                        offsetX > threshold && currentIndex > 0 -> {
-                            currentIndex--
-                        }
-
-                        offsetX < -threshold && currentIndex < carouselImages.size - 1 -> {
-                            currentIndex++
-                        }
-                    }
-                    offsetX = 0f
-                }, onDrag = { _, dragAmount -> offsetX += dragAmount.x })
-            }) {
-        Image(
-            painter = painterResource(id = carouselImages[currentIndex]),
-            contentDescription = "Carousel Image $currentIndex",
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        HorizontalPager(
             modifier = Modifier
-                .fillMaxSize()
-                .offset {
-                    IntOffset(animatedOffsetX.roundToInt(), 0)
-                },
-            contentScale = ContentScale.Crop
-        )
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .align(Alignment.Center),
+            state = pagerState
+        ) { page ->
+            AsyncImage(
+                model = banners[page].bannerImageUrl,
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable { onClickBanner(banners[page].title) },
+                contentScale = ContentScale.Crop,
+            )
+        }
 
-        // Page indicators
+        DotsIndicator(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            totalDots = banners.size, selectedIndex = pagerState.currentPage
+        )
+    }
+}
+
+
+@Composable
+fun ShimmerBannerSection() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .shimmer()
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+    ) {
+        // Add some content-like shimmer elements to make it more realistic
+        Column(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(Spacing.md),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm)
+        ) {
+            // Title shimmer
+            ShimmerBox(modifier = Modifier.fillMaxWidth(0.6f), height = 24.dp)
+
+            // Subtitle shimmer
+            ShimmerBox(modifier = Modifier.fillMaxWidth(0.4f), height = 16.dp)
+        }
+
+        // Page indicators shimmer at bottom
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(Spacing.sm),
             horizontalArrangement = Arrangement.spacedBy(Spacing.xs)
+        ) { repeat(3) { ShimmerCircle(size = 8.dp) } }
+    }
+}
+
+
+@Composable
+fun ErrorBannerSection(
+    isNetwork: Boolean = true,
+    onRetrySection: () -> Unit = {},
+) {
+    val message =
+        if (isNetwork) "Network Error. Please try again." else "Something went wrong. Please try again."
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.errorContainer),
+        contentAlignment = Alignment.Center,
+    ) {
+        Row(
+            modifier = Modifier.padding(Spacing.md),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            carouselImages.forEachIndexed { index, _ ->
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(
-                            if (index == currentIndex) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.onSurface.copy(
-                                alpha = 0.3f
-                            )
-                        )
+            Text(message, modifier = Modifier.weight(1f))
+            Spacer(Modifier.width(Spacing.sm))
+            Button(
+                onRetrySection,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onError,
                 )
+            ) {
+                Text("Try Again", softWrap = false)
             }
         }
     }
 }
+
+@Preview()
+@Composable
+private fun ShimmerBannerSectionPreview() {
+    CarouselSection(state = UiState.Loading)
+}
+
+@Preview()
+@Composable
+private fun ErrorBannerSectionPreview() {
+    CarouselSection(state = UiState.NetworkError)
+}
+
+
+@Preview()
+@Composable
+private fun BannerCarouselSectionPreview() {
+    CarouselSection(state = UiState.Success(data = listOf(BannerDomain(), BannerDomain(), BannerDomain())))
+}
+

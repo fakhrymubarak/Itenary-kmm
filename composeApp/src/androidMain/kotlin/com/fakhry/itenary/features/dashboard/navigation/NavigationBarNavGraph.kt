@@ -11,11 +11,14 @@ import com.fakhry.itenary.features.dashboard.food.navigation.foodNavGraph
 import com.fakhry.itenary.features.dashboard.history.navigation.historyResultsNavGraph
 import com.fakhry.itenary.features.dashboard.itinerary.navigation.ReqStreamItineraryRoute
 import com.fakhry.itenary.features.dashboard.itinerary.navigation.reqStreamItineraryNavGraph
+import com.fakhry.itenary.features.dashboard.ui.DashboardViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun NavigationBarNavGraph(
     navHostController: NavHostController,
     innerPadding: PaddingValues,
+    dashboardViewModel: DashboardViewModel = koinViewModel(),
     onNavigateToDetails: (ItineraryRequestUiModel) -> Unit,
 ) {
     NavHost(
@@ -23,7 +26,10 @@ fun NavigationBarNavGraph(
         navController = navHostController,
         startDestination = ReqStreamItineraryRoute,
     ) {
-        reqStreamItineraryNavGraph(onNavigateToDetails)
+        reqStreamItineraryNavGraph(
+            dashboardViewModel = dashboardViewModel,
+            onNavigateToDetails = onNavigateToDetails,
+        )
         foodNavGraph(onNavigateBack = navHostController::popBackStack)
         historyResultsNavGraph(onNavigateBack = navHostController::popBackStack)
     }

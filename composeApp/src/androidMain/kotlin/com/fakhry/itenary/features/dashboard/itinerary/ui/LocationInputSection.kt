@@ -16,6 +16,7 @@ import com.fakhry.itenary.features.dashboard.ui.ValidationPlaceResult
 
 @Composable
 fun LocationInputSection(
+    modifier: Modifier = Modifier,
     place: String,
     onPlaceChange: (String) -> Unit,
     validationPlaceResult: ValidationPlaceResult,
@@ -25,13 +26,13 @@ fun LocationInputSection(
 
     Column {
         OutlinedTextField(
+            modifier = modifier.fillMaxWidth(),
             value = place,
             onValueChange = onPlaceChange,
             label = { Text("Where to?") },
             leadingIcon = {
                 Icon(imageVector = Icons.Rounded.Map, contentDescription = "Location")
             },
-            modifier = Modifier.Companion.fillMaxWidth(),
             singleLine = true,
             isError = isError,
         )

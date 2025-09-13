@@ -27,6 +27,7 @@ kotlin {
             implementation(libs.orbit.compose)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.androidx.material.icons.extended)
+            implementation(libs.shimmer)
         }
         commonMain.dependencies {
             implementation(compose.runtime)

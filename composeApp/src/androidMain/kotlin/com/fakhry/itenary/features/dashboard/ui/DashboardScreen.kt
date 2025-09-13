@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import com.fakhry.itenary.commons.model.ItineraryRequestUiModel
 import com.fakhry.itenary.features.dashboard.navigation.NavigationBarNavGraph
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -14,6 +15,7 @@ fun DashboardScreen(
     navHostController: NavHostController,
     onNavigateToDetails: (ItineraryRequestUiModel) -> Unit = {},
 ) {
+    val viewModel = koinViewModel<DashboardViewModel>()
     Scaffold(
         bottomBar = {
             ItenaryBottomNavigation(navHostController)
@@ -23,6 +25,7 @@ fun DashboardScreen(
         NavigationBarNavGraph(
             navHostController = navHostController,
             innerPadding = innerPadding,
+            dashboardViewModel = viewModel,
             onNavigateToDetails = onNavigateToDetails
         )
     }

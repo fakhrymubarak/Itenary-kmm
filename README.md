@@ -13,3 +13,6 @@ This is a Kotlin Multiplatform project targeting Android, iOS.
 5. When day more than 1, the re-composition recomposing entire section.
 6. Stream Itinerary not animated.
 7. Add More day not animated.
+8. Dirty Code
+    - A Lot Of Hardcoded Strings
+    - Messy theming

@@ -20,6 +20,7 @@ orbitViewmodel = "10.0.0"
 serialization = "1.9.0"
 koin = "4.1.1"
 coil = "2.7.0"
+shimmer = "1.0.5"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -58,6 +59,11 @@ kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutine
 
 # Coil
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
+
+# Shimmer
+shimmer = { module = "com.valentinilk.shimmer:compose-shimmer", version.ref = "shimmer" }
+
+# Orbit MVI
 orbit-compose = { module = "org.orbit-mvi:orbit-compose", version.ref = "orbitViewmodel" }
 orbit-viewmodel = { module = "org.orbit-mvi:orbit-viewmodel", version.ref = "orbitViewmodel" }
 

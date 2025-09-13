@@ -16,7 +16,7 @@ data class DayRequestUiModel(
     val day: Int = 1,
     val startTime: String = "09:00",
     val endTime: String = "18:00",
-    val pace: Float = 5f,
+    val pace: Float = 6f,
 )
 
 fun List<DayRequestUiModel>.toListDayRequest() = map {
