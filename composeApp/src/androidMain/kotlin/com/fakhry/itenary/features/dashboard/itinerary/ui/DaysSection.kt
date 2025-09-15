@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
@@ -83,7 +83,8 @@ fun DaysSection(
         // Add More Day Button
         ElevatedButton(
             onClick = onAddDay,
-            contentPadding = ButtonDefaults.ButtonWithIconContentPadding
+            contentPadding = PaddingValues(horizontal = 12.dp),
+            modifier = Modifier.height(32.dp),
         ) {
             Icon(
                 modifier = Modifier.size(18.dp),
@@ -130,11 +131,15 @@ fun DayCard(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Companion.Bold
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     // Start Time Button
                     ElevatedButton(
                         onClick = { showStartTimePicker = true },
-                        contentPadding = ButtonDefaults.TextButtonContentPadding
+                        contentPadding = PaddingValues(0.dp),
+                        modifier = Modifier.height(24.dp),
                     ) {
                         Text(
                             startTime,
@@ -145,7 +150,8 @@ fun DayCard(
                     // End Time Button
                     ElevatedButton(
                         onClick = { showEndTimePicker = true },
-                        contentPadding = ButtonDefaults.TextButtonContentPadding
+                        contentPadding = PaddingValues(0.dp),
+                        modifier = Modifier.height(24.dp),
                     ) {
                         Text(
                             endTime,
@@ -155,7 +161,10 @@ fun DayCard(
 
                     // Remove Button (only show if more than 1 day)
                     onRemove?.let { removeAction ->
-                        IconButton(onClick = removeAction) {
+                        IconButton(
+                            onClick = removeAction,
+                            modifier = Modifier.size(20.dp)
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = "Remove Day",
@@ -297,10 +306,10 @@ fun Pace(
 fun DaysSectionPreview() {
     ItenaryTheme {
         DaysSection(
-            days = listOf(DayRequestUiModel()),
+            days = listOf(DayRequestUiModel(), DayRequestUiModel()),
             onUpdateDayTime = { _, _, _, _ -> },
             onAddDay = {},
-            onRemoveDay = {},
+            onRemoveDay = { },
         )
     }
 }

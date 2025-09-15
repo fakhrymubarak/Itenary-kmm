@@ -25,7 +25,7 @@ sealed class UiState<out T>() {
 
 data class DashboardState(
     val itineraryRequest: ItineraryRequestUiModel = ItineraryRequestUiModel(days = listOf(DayRequestUiModel())),
-    val validationPlaceResult: ValidationPlaceResult = ValidationPlaceResult.VALID,
+    val validationPlaceResult: ValidationPlaceResult = ValidationPlaceResult.INIT,
     val banners: UiState<List<BannerDomain>> = UiState.Loading,
 )
 

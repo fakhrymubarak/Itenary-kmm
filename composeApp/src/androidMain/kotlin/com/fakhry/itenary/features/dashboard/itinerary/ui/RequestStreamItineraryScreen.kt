@@ -102,7 +102,6 @@ fun RequestStreamItineraryScreen(
 @Composable
 private fun RequestStreamItineraryScreenPreview() {
     ItenaryTheme {
-        RequestStreamItineraryScreen(
-        )
+        RequestStreamItineraryScreen()
     }
 }
