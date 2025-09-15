@@ -11,6 +11,8 @@ import com.itenary.shared.util.DispatcherProvider
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.viewmodel.container
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 enum class ValidationPlaceResult {
     INIT, VALID, INVALID_CANNOT_EMPTY, INVALID_LENGTH_TOO_SHORT, INVALID_LENGTH_TOO_LONG,
@@ -39,6 +41,7 @@ class DashboardViewModel(
     private val dispatcher: DispatcherProvider,
 ) : ViewModel(), ContainerHost<DashboardState, DashboardSideEffect> {
 
+    private val timeFormatter by lazy { DateTimeFormatter.ofPattern("HH:mm") }
     override val container = container<DashboardState, DashboardSideEffect>(initialState = DashboardState())
 
     fun updatePlace(place: String) = intent {
@@ -50,12 +53,11 @@ class DashboardViewModel(
         }
     }
 
-    fun updateDayTime(dayIndex: Int, startTime: String, endTime: String, pace: Float) = intent {
+    fun updateDayTime(dayIndex: Int, day: DayRequestUiModel) = intent {
         val currentDays = state.itineraryRequest.days.toMutableList()
         if (dayIndex < currentDays.size) {
-            currentDays[dayIndex] = currentDays[dayIndex].copy(
-                startTime = startTime, endTime = endTime, pace = pace
-            )
+            val fixed = day.enforceTimeWindow()
+            currentDays[dayIndex] = fixed
             reduce {
                 state.copy(itineraryRequest = state.itineraryRequest.copy(days = currentDays))
             }
@@ -93,15 +95,26 @@ class DashboardViewModel(
             }
         }
     }
-}
 
-private fun validatePlace(place: String): ValidationPlaceResult {
-    val trimmedPlace = place.trim()
-    return when {
-        trimmedPlace.isBlank() -> ValidationPlaceResult.INVALID_CANNOT_EMPTY
-        trimmedPlace.length < 2 -> ValidationPlaceResult.INVALID_LENGTH_TOO_SHORT
-        trimmedPlace.length > 100 -> ValidationPlaceResult.INVALID_LENGTH_TOO_LONG
-        else -> ValidationPlaceResult.VALID
+    private fun DayRequestUiModel.enforceTimeWindow(minMinutes: Long = 1L): DayRequestUiModel {
+        val start = LocalTime.parse(startTime, timeFormatter)
+        val end = LocalTime.parse(endTime, timeFormatter)
+        return if (start.isBefore(end)) {
+            this
+        } else {
+            val adjustedEnd = start.plusMinutes(minMinutes)
+            copy(endTime = adjustedEnd.format(timeFormatter))
+        }
+    }
+
+    private fun validatePlace(place: String): ValidationPlaceResult {
+        val trimmedPlace = place.trim()
+        return when {
+            trimmedPlace.isBlank() -> ValidationPlaceResult.INVALID_CANNOT_EMPTY
+            trimmedPlace.length < 2 -> ValidationPlaceResult.INVALID_LENGTH_TOO_SHORT
+            trimmedPlace.length > 100 -> ValidationPlaceResult.INVALID_LENGTH_TOO_LONG
+            else -> ValidationPlaceResult.VALID
+        }
     }
 }
 
@@ -114,3 +127,4 @@ private fun <T, R> DomainResult<T>.mapDomainResultToUiState(
         is DomainResult.Success<T> -> UiState.Success(mapper(data))
     }
 }
+

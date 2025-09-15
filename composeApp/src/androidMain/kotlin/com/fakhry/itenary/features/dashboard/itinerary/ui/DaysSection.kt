@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -31,6 +34,7 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,154 +50,142 @@ import com.fakhry.itenary.theme.Spacing
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-@Composable
-fun DaysSection(
-    modifier: Modifier = Modifier,
+fun LazyListScope.daysSection(
     days: List<DayRequestUiModel>,
-    onUpdateDayTime: (Int, String, String, Float) -> Unit,
+    onUpdateDayTime: (Int, DayRequestUiModel) -> Unit,
     onAddDay: () -> Unit,
     onRemoveDay: (Int) -> Unit,
+    key: (DayRequestUiModel) -> Any = { it.day }, // Prefer a stable unique id if you have one
 ) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        days.forEachIndexed { index, dayRequest ->
-            DayCard(
-                dayNumber = dayRequest.day,
-                startTime = dayRequest.startTime,
-                endTime = dayRequest.endTime,
-                onStartTimeChange = { newTime ->
-                    onUpdateDayTime(index, newTime, dayRequest.endTime, dayRequest.pace)
-                },
-                onEndTimeChange = { newTime ->
-                    onUpdateDayTime(index, dayRequest.startTime, newTime, dayRequest.pace)
-                },
-                onRemove = if (days.size > 1) {
-                    { onRemoveDay(index) }
-                } else null,
-                pace = dayRequest.pace,
-                onPaceChange = { newPace ->
-                    onUpdateDayTime(index, dayRequest.startTime, dayRequest.endTime, newPace)
-                }
-            )
-        }
+    itemsIndexed(items = days, key = { _, d -> key(d) }) { index, day ->
+        DayCard(
+            modifier = Modifier.padding(horizontal = Spacing.sm),
+            day = day,
+            onUpdateDay = { onUpdateDayTime(index, it) },
+            onRemove = if (days.size > 1) ({ onRemoveDay(index) }) else null,
+        )
+    }
 
-        // Add More Day Button
+    item {
         ElevatedButton(
-            onClick = onAddDay,
-            contentPadding = PaddingValues(horizontal = 12.dp),
-            modifier = Modifier.height(32.dp),
+            onClick = onAddDay, modifier = Modifier
+                .padding(horizontal = Spacing.sm)
+                .height(32.dp)
         ) {
-            Icon(
-                modifier = Modifier.size(18.dp),
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add Day"
-            )
-            Spacer(modifier = Modifier.Companion.width(Spacing.xs))
+            Icon(imageVector = Icons.Default.Add, contentDescription = "Add Day")
             Text("Add More Day", style = MaterialTheme.typography.labelSmall)
         }
     }
 }
 
+
 @Composable
 fun DayCard(
+    modifier: Modifier = Modifier,
+    day: DayRequestUiModel,
+    onUpdateDay: (DayRequestUiModel) -> Unit,
+    onRemove: (() -> Unit)?,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.outlinedCardColors(),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(Spacing.md),
+        ) {
+            DayHeaderRow(
+                day.day, day.startTime, day.endTime, onUpdateTimeWindow = { start, end ->
+                    onUpdateDay(day.copy(startTime = start, endTime = end))
+                }, onRemove
+            )
+
+            Spacer(modifier = Modifier.height(Spacing.sm))
+
+            PaceSection(pace = day.pace, onPaceCommit = { onUpdateDay(day.copy(pace = it)) })
+        }
+    }
+}
+
+@Composable
+private fun DayHeaderRow(
     dayNumber: Int,
     startTime: String,
     endTime: String,
-    onStartTimeChange: (String) -> Unit,
-    onEndTimeChange: (String) -> Unit,
-    pace: Float,
-    onPaceChange: (Float) -> Unit,
+    onUpdateTimeWindow: (String, String) -> Unit,
     onRemove: (() -> Unit)?,
 ) {
     var showStartTimePicker by remember { mutableStateOf(false) }
     var showEndTimePicker by remember { mutableStateOf(false) }
 
-    Card(
-        modifier = Modifier.Companion.fillMaxWidth(),
-        colors = CardDefaults.outlinedCardColors(),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface),
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Column(
-            modifier = Modifier.Companion
-                .fillMaxWidth()
-                .padding(Spacing.md),
+        Text(
+            text = "Day $dayNumber", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(Spacing.sm), verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier.Companion.fillMaxWidth(),
-                verticalAlignment = Alignment.Companion.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Day $dayNumber",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Companion.Bold
-                )
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Start Time Button
-                    ElevatedButton(
-                        onClick = { showStartTimePicker = true },
-                        contentPadding = PaddingValues(0.dp),
-                        modifier = Modifier.height(24.dp),
-                    ) {
-                        Text(
-                            startTime,
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
+            // Start Time Button
+            ElevatedButton(
+                onClick = { showStartTimePicker = true },
+                contentPadding = PaddingValues(0.dp),
+                modifier = Modifier.height(24.dp),
+            ) { Text(startTime, style = MaterialTheme.typography.labelSmall) }
 
-                    // End Time Button
-                    ElevatedButton(
-                        onClick = { showEndTimePicker = true },
-                        contentPadding = PaddingValues(0.dp),
-                        modifier = Modifier.height(24.dp),
-                    ) {
-                        Text(
-                            endTime,
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
+            // End Time Button
+            ElevatedButton(
+                onClick = { showEndTimePicker = true },
+                contentPadding = PaddingValues(0.dp),
+                modifier = Modifier.height(24.dp),
+            ) { Text(endTime, style = MaterialTheme.typography.labelSmall) }
 
-                    // Remove Button (only show if more than 1 day)
-                    onRemove?.let { removeAction ->
-                        IconButton(
-                            onClick = removeAction,
-                            modifier = Modifier.size(20.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Remove Day",
-                                tint = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    }
+            // Remove Button (only show if more than 1 day)
+            onRemove?.let { removeAction ->
+                IconButton(onClick = removeAction, modifier = Modifier.size(20.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Remove Day",
+                        tint = MaterialTheme.colorScheme.error
+                    )
                 }
             }
-
-            Spacer(modifier = Modifier.height(Spacing.sm))
-
-            Pace(pace = pace, onPaceChange = onPaceChange)
         }
     }
 
-    // Time Pickers
     if (showStartTimePicker) {
-        TimePickerDialog(initialTime = startTime, onTimeSelected = { time ->
-            onStartTimeChange(time)
-            showStartTimePicker = false
-        }, onDismiss = { showStartTimePicker = false })
+        val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+        val currentEnd = LocalTime.parse(endTime, timeFormatter)
+        TimePickerDialog(
+            initialTime = startTime,
+            onTimeSelected = {
+                showStartTimePicker = false
+                if (startTime == it) return@TimePickerDialog
+                onUpdateTimeWindow(it, endTime)
+            },
+            onDismiss = { showStartTimePicker = false },
+            confirmEnabled = { candidate -> candidate.isBefore(currentEnd) },
+        )
     }
 
     if (showEndTimePicker) {
-        TimePickerDialog(initialTime = endTime, onTimeSelected = { time ->
-            onEndTimeChange(time)
-            showEndTimePicker = false
-        }, onDismiss = { showEndTimePicker = false })
+        val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+        val currentStart = LocalTime.parse(startTime, timeFormatter)
+        TimePickerDialog(
+            initialTime = endTime,
+            onTimeSelected = {
+                showEndTimePicker = false
+                if (endTime == it) return@TimePickerDialog
+                onUpdateTimeWindow(startTime, it)
+            },
+            onDismiss = { showEndTimePicker = false },
+            confirmEnabled = { candidate -> candidate.isAfter(currentStart) },
+        )
     }
 }
 
@@ -203,6 +195,7 @@ fun TimePickerDialog(
     initialTime: String,
     onTimeSelected: (String) -> Unit,
     onDismiss: () -> Unit,
+    confirmEnabled: (LocalTime) -> Boolean = { true },
 ) {
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
     val initialLocalTime = LocalTime.parse(initialTime, timeFormatter)
@@ -217,25 +210,23 @@ fun TimePickerDialog(
         text = { TimePicker(state = timePickerState) },
         confirmButton = {
             TextButton(
-                onClick = {
+                enabled = confirmEnabled(LocalTime.of(timePickerState.hour, timePickerState.minute)), onClick = {
                     val selectedTime = LocalTime.of(timePickerState.hour, timePickerState.minute)
                     onTimeSelected(selectedTime.format(timeFormatter))
-                }) {
-                Text("OK")
-            }
+                }) { Text("OK") }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } })
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
-fun Pace(
+fun PaceSection(
     pace: Float,
-    onPaceChange: (Float) -> Unit,
+    onPaceCommit: (Float) -> Unit,
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
-            text = "Pace", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Companion.SemiBold
+            text = "Pace", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold
         )
 
         Spacer(modifier = Modifier.width(Spacing.md))
@@ -245,7 +236,7 @@ fun Pace(
                 Text(
                     text = "Relaxed",
                     style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Companion.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -253,40 +244,17 @@ fun Pace(
                 Text(
                     text = "Fast",
                     style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Companion.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
             }
 
-            Slider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(30.dp),
-                value = pace,
-                onValueChange = onPaceChange,
-                valueRange = 1f..10f,
-                thumb = {
-                    SliderDefaults.Thumb(
-                        interactionSource = remember { MutableInteractionSource() },
-                        colors = SliderDefaults.colors(),
-                        thumbSize = DpSize(Spacing.md, Spacing.md)
-                    )
-                },
-                track = { sliderPositions ->
-                    val colors = SliderDefaults.colors()
-                    SliderDefaults.Track(
-                        modifier = Modifier.height(Spacing.sm), // custom track thickness
-                        enabled = true,
-                        colors = colors,
-                        sliderState = sliderPositions,
-                        drawStopIndicator = { },
-                        drawTick = { _, _ -> })
-                })
+            Pace(pace, onPaceCommit)
 
             Row {
                 Text(
                     text = "\uD83D\uDC22",
                     style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Companion.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -294,22 +262,62 @@ fun Pace(
                 Text(
                     text = "\uD83D\uDC07",
                     style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Companion.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Pace(
+    pace: Float,
+    onPaceCommit: (Float) -> Unit,
+) {
+    var tempPace by remember(pace) { mutableFloatStateOf(pace) }
+    Slider(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(30.dp),
+        value = tempPace,
+        onValueChange = { tempPace = it },
+        onValueChangeFinished = {
+            if (tempPace != pace) onPaceCommit(tempPace)
+        },
+        valueRange = 1f..10f,
+        thumb = {
+            SliderDefaults.Thumb(
+                interactionSource = remember { MutableInteractionSource() },
+                colors = SliderDefaults.colors(),
+                thumbSize = DpSize(Spacing.md, Spacing.md)
+            )
+        },
+        track = { sliderPositions ->
+            val colors = SliderDefaults.colors()
+            SliderDefaults.Track(
+                modifier = Modifier.height(Spacing.sm), // custom track thickness
+                enabled = true,
+                colors = colors,
+                sliderState = sliderPositions,
+                drawStopIndicator = {},
+                drawTick = { _, _ -> })
+        })
+
+}
+
 @Composable
 @Preview(showBackground = true)
 fun DaysSectionPreview() {
     ItenaryTheme {
-        DaysSection(
-            days = listOf(DayRequestUiModel(), DayRequestUiModel()),
-            onUpdateDayTime = { _, _, _, _ -> },
-            onAddDay = {},
-            onRemoveDay = { },
-        )
+
+        LazyColumn {
+            daysSection(
+                days = listOf(DayRequestUiModel(), DayRequestUiModel()),
+                onUpdateDayTime = { _, _ -> },
+                onAddDay = {},
+                onRemoveDay = { },
+            )
+        }
     }
 }

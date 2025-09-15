@@ -68,22 +68,18 @@ fun RequestStreamItineraryScreen(
 
             item {
                 LocationInputSection(
-                    modifier = Modifier.padding(horizontal = Spacing.sm),
                     place = state.itineraryRequest.place,
                     onPlaceChange = viewModel::updatePlace,
                     validationPlaceResult = state.validationPlaceResult,
                 )
             }
 
-            item {
-                DaysSection(
-                    modifier = Modifier.padding(horizontal = Spacing.sm),
-                    days = state.itineraryRequest.days,
-                    onUpdateDayTime = viewModel::updateDayTime,
-                    onAddDay = viewModel::addDay,
-                    onRemoveDay = viewModel::removeDay,
-                )
-            }
+            daysSection(
+                days = state.itineraryRequest.days,
+                onUpdateDayTime = viewModel::updateDayTime,
+                onAddDay = viewModel::addDay,
+                onRemoveDay = viewModel::removeDay,
+            )
 
             item {
                 Button(

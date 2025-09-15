@@ -13,10 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.fakhry.itenary.features.dashboard.ui.ValidationPlaceResult
+import com.fakhry.itenary.theme.Spacing
 
 @Composable
 fun LocationInputSection(
-    modifier: Modifier = Modifier,
     place: String,
     onPlaceChange: (String) -> Unit,
     validationPlaceResult: ValidationPlaceResult,
@@ -26,7 +26,9 @@ fun LocationInputSection(
 
     Column {
         OutlinedTextField(
-            modifier = modifier.fillMaxWidth(),
+            modifier = Modifier
+                .padding(horizontal = Spacing.sm)
+                .fillMaxWidth(),
             value = place,
             onValueChange = onPlaceChange,
             label = { Text("Where to?") },
