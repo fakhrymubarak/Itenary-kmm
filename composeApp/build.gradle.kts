@@ -28,6 +28,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.androidx.material.icons.extended)
             implementation(libs.shimmer)
+            implementation(libs.inspektor)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -72,6 +73,9 @@ android {
     }
     packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
     buildTypes { getByName("release") { isMinifyEnabled = false } }
+    buildFeatures {
+        buildConfig = true
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11

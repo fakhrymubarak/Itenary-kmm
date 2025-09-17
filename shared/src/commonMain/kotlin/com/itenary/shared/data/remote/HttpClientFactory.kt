@@ -21,6 +21,21 @@ class HttpClientFactory(
     @OptIn(UnstableInspektorAPI::class)
     fun create(engine: HttpClientEngineProvider): HttpClient {
         return HttpClient(engine.provide()) {
+            install(ContentNegotiation) {
+                json(
+                    Json {
+                        ignoreUnknownKeys = true
+                        explicitNulls = false
+                        isLenient = true
+                    }
+                )
+            }
+            install(SSE)
+            install(HttpTimeout) {
+                connectTimeoutMillis = 15_000
+                requestTimeoutMillis = 30_000
+                socketTimeoutMillis = 30_000
+            }
             install(Inspektor) {
                 level = HEADERS
                 maxContentLength = 100_000
@@ -29,20 +44,7 @@ class HttpClientFactory(
                 showNotifications = true
                 retentionDuration = 30.days
             }
-            install(ContentNegotiation) {
-                json(
-                    Json {
-                        ignoreUnknownKeys = true
-                        explicitNulls = false
-                        isLenient = true
-                    })
-            }
-            install(SSE)
-            install(HttpTimeout) {
-                connectTimeoutMillis = 15_000
-                requestTimeoutMillis = 30_000
-                socketTimeoutMillis = 30_000
-            }
+
             if (enableLogging) {
                 install(Logging) {
                     logger = object : Logger {
