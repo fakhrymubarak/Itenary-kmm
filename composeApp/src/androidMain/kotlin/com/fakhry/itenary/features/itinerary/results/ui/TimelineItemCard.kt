@@ -235,7 +235,7 @@ fun TimelineItemCardPreview() {
     ItenaryTheme {
         TimelineSection(
             mutableListOf(
-                // Day 1 - Visit Monas
+                // TransitionDayState 1 - Visit Monas
                 TimelineItemDomain(
                     timeStart = "09:00",
                     timeEnd = "11:00",
@@ -250,7 +250,7 @@ fun TimelineItemCardPreview() {
                     confidence = 95
                 ).toUiModel(),
 
-                // Day 1 - Lunch at Cafe Batavia
+                // TransitionDayState 1 - Lunch at Cafe Batavia
                 TimelineItemDomain(
                     timeStart = "11:30",
                     timeEnd = "13:00",
@@ -273,7 +273,7 @@ fun TimelineItemCardPreview() {
                     confidence = 90
                 ).toUiModel(),
 
-                // Day 1 - Explore Kota Tua
+                // TransitionDayState 1 - Explore Kota Tua
                 TimelineItemDomain(
                     timeStart = "13:15",
                     timeEnd = "16:00",
@@ -296,7 +296,7 @@ fun TimelineItemCardPreview() {
                     confidence = 92
                 ).toUiModel(),
 
-                // Day 2 - Visit Istiqlal Mosque
+                // TransitionDayState 2 - Visit Istiqlal Mosque
                 TimelineItemDomain(
                     timeStart = "09:00",
                     timeEnd = "10:30",
@@ -319,7 +319,7 @@ fun TimelineItemCardPreview() {
                     confidence = 96
                 ).toUiModel(),
 
-                // Day 3 - Visit Taman Mini Indonesia Indah
+                // TransitionDayState 3 - Visit Taman Mini Indonesia Indah
                 TimelineItemDomain(
                     timeStart = "09:00",
                     timeEnd = "14:00",

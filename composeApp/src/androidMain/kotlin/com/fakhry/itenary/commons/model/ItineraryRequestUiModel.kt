@@ -13,6 +13,7 @@ data class ItineraryRequestUiModel(
 
 @Serializable
 data class DayRequestUiModel(
+    val id: Int = 0,
     val day: Int = 1,
     val startTime: String = "09:00",
     val endTime: String = "18:00",

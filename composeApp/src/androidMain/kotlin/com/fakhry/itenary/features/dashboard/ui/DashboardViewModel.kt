@@ -44,6 +44,10 @@ class DashboardViewModel(
     private val timeFormatter by lazy { DateTimeFormatter.ofPattern("HH:mm") }
     override val container = container<DashboardState, DashboardSideEffect>(initialState = DashboardState())
 
+    init {
+        loadBanners()
+    }
+
     fun updatePlace(place: String) = intent {
         reduce {
             state.copy(
@@ -64,20 +68,16 @@ class DashboardViewModel(
         }
     }
 
-    fun addDay() = intent {
+    fun addDay(currentDay: DayRequestUiModel) = intent {
         val currentDays = state.itineraryRequest.days.toMutableList()
-        val newDayNumber = currentDays.size + 1
-        currentDays.add(DayRequestUiModel(day = newDayNumber))
+        currentDays.add(currentDay)
         reduce { state.copy(itineraryRequest = state.itineraryRequest.copy(days = currentDays)) }
     }
 
-    fun removeDay(dayIndex: Int) = intent {
+    fun removeDay(newDayList: List<DayRequestUiModel>) = intent {
         if (state.itineraryRequest.days.size > 1) {
-            val currentDays = state.itineraryRequest.days.toMutableList()
-            currentDays.removeAt(dayIndex)
-            val renumberedDays = currentDays.mapIndexed { index, dayRequest -> dayRequest.copy(day = index + 1) }
             reduce {
-                state.copy(itineraryRequest = state.itineraryRequest.copy(days = renumberedDays))
+                state.copy(itineraryRequest = state.itineraryRequest.copy(days = newDayList))
             }
         }
     }
@@ -127,4 +127,3 @@ private fun <T, R> DomainResult<T>.mapDomainResultToUiState(
         is DomainResult.Success<T> -> UiState.Success(mapper(data))
     }
 }
-

@@ -1,5 +1,10 @@
 package com.fakhry.itenary.features.dashboard.itinerary.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +38,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -50,44 +58,88 @@ import com.fakhry.itenary.theme.Spacing
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
+private var dayId = 0
 fun LazyListScope.daysSection(
-    days: List<DayRequestUiModel>,
+    tempDaysState: MutableState<List<TransitionDayState>>,
     onUpdateDayTime: (Int, DayRequestUiModel) -> Unit,
-    onAddDay: () -> Unit,
-    onRemoveDay: (Int) -> Unit,
-    key: (DayRequestUiModel) -> Any = { it.day }, // Prefer a stable unique id if you have one
+    onAddDay: (DayRequestUiModel) -> Unit,
+    onRemoveDay: (List<DayRequestUiModel>) -> Unit,
 ) {
-    itemsIndexed(items = days, key = { _, d -> key(d) }) { index, day ->
-        DayCard(
-            modifier = Modifier.padding(horizontal = Spacing.sm),
-            day = day,
-            onUpdateDay = { onUpdateDayTime(index, it) },
-            onRemove = if (days.size > 1) ({ onRemoveDay(index) }) else null,
-        )
-    }
+    itemsIndexed(
+        items = tempDaysState.value,
+        key = { _, d -> d.day.id },
+    ) { index, dayState ->
+        val visibleState = dayState.transitionState
+        val exitFinished by remember { derivedStateOf { !visibleState.currentState && visibleState.isIdle } }
 
+        // Fire once when exit completes
+        LaunchedEffect(exitFinished) {
+            if (exitFinished) {
+                val id = dayState.day.id
+                val newList = tempDaysState.value
+                    .filterNot { it.day.id == id }
+                    .mapIndexed { i, s -> s.copy(day = s.day.copy(day = i + 1)) }
+                tempDaysState.value = newList
+                onRemoveDay(newList.map { it.day })
+            }
+        }
+
+        AnimatedVisibility(
+            modifier = Modifier.padding(horizontal = Spacing.sm),
+            visibleState = visibleState,
+            enter = expandVertically(
+                animationSpec = tween()
+            ),
+            exit = shrinkVertically(
+                animationSpec = tween()
+            ),
+        ) {
+            DayCard(
+                day = dayState.day,
+                onUpdateDay = { onUpdateDayTime(index, dayState.day) },
+                isShowRemoveIcon = index > 0,
+                onRemove = {
+                    visibleState.targetState = false
+                },
+            )
+        }
+    }
+    item { Spacer(modifier = Modifier.height(Spacing.sm)) }
     item {
         ElevatedButton(
-            onClick = onAddDay, modifier = Modifier
+            onClick = {
+                val newTransitionState = MutableTransitionState(false)
+                val currentListDay = tempDaysState.value.toMutableList()
+                val newDayNumber = currentListDay.size + 1
+                val newDay = DayRequestUiModel(id = ++dayId, day = newDayNumber)
+                val newDayState = TransitionDayState(newDay, newTransitionState)
+                currentListDay.add(newDayState)
+                tempDaysState.value = currentListDay
+                newTransitionState.targetState = true
+
+                onAddDay(newDay)
+            }, modifier = Modifier
                 .padding(horizontal = Spacing.sm)
                 .height(32.dp)
         ) {
-            Icon(imageVector = Icons.Default.Add, contentDescription = "Add Day")
+            Icon(imageVector = Icons.Default.Add, contentDescription = null)
             Text("Add More Day", style = MaterialTheme.typography.labelSmall)
         }
     }
 }
-
 
 @Composable
 fun DayCard(
     modifier: Modifier = Modifier,
     day: DayRequestUiModel,
     onUpdateDay: (DayRequestUiModel) -> Unit,
-    onRemove: (() -> Unit)?,
+    isShowRemoveIcon: Boolean,
+    onRemove: () -> Unit,
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(bottom = Spacing.sm),
         colors = CardDefaults.outlinedCardColors(),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface),
     ) {
@@ -97,9 +149,14 @@ fun DayCard(
                 .padding(Spacing.md),
         ) {
             DayHeaderRow(
-                day.day, day.startTime, day.endTime, onUpdateTimeWindow = { start, end ->
+                dayNumber = day.day,
+                startTime = day.startTime,
+                endTime = day.endTime,
+                onUpdateTimeWindow = { start, end ->
                     onUpdateDay(day.copy(startTime = start, endTime = end))
-                }, onRemove
+                },
+                isShowRemoveIcon = isShowRemoveIcon,
+                onRemove = onRemove
             )
 
             Spacer(modifier = Modifier.height(Spacing.sm))
@@ -115,7 +172,8 @@ private fun DayHeaderRow(
     startTime: String,
     endTime: String,
     onUpdateTimeWindow: (String, String) -> Unit,
-    onRemove: (() -> Unit)?,
+    isShowRemoveIcon: Boolean,
+    onRemove: () -> Unit,
 ) {
     var showStartTimePicker by remember { mutableStateOf(false) }
     var showEndTimePicker by remember { mutableStateOf(false) }
@@ -145,9 +203,8 @@ private fun DayHeaderRow(
                 modifier = Modifier.height(24.dp),
             ) { Text(endTime, style = MaterialTheme.typography.labelSmall) }
 
-            // Remove Button (only show if more than 1 day)
-            onRemove?.let { removeAction ->
-                IconButton(onClick = removeAction, modifier = Modifier.size(20.dp)) {
+            if (isShowRemoveIcon) {
+                IconButton(onClick = onRemove, modifier = Modifier.size(20.dp)) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Remove Day",
@@ -310,14 +367,7 @@ fun Pace(
 @Preview(showBackground = true)
 fun DaysSectionPreview() {
     ItenaryTheme {
-
         LazyColumn {
-            daysSection(
-                days = listOf(DayRequestUiModel(), DayRequestUiModel()),
-                onUpdateDayTime = { _, _ -> },
-                onAddDay = {},
-                onRemoveDay = { },
-            )
         }
     }
 }

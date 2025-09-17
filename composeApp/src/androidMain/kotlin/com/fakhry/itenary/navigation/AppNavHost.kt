@@ -11,7 +11,7 @@ import com.fakhry.itenary.features.dashboard.navigation.dashboardNavGraph
 import com.fakhry.itenary.features.itinerary.results.navigation.itineraryResultsNavController
 import com.fakhry.itenary.features.itinerary.results.navigation.itineraryResultsNavGraph
 
-private const val ANIMATION_DURATION = 300
+private const val ANIMATION_DURATION = 500
 
 @Composable
 fun AppNavHost(
