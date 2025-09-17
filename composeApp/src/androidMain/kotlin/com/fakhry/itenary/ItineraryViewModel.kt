@@ -10,6 +10,7 @@ import com.itenary.shared.domain.model.ItineraryRequest
 import com.itenary.shared.domain.model.StreamingEvent
 import com.itenary.shared.domain.usecase.StreamItineraryUseCase
 import com.itenary.shared.util.DispatcherProvider
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -51,13 +52,15 @@ class ItineraryViewModel(
     private var latest: ResultItineraryUiState = ResultItineraryUiState()
     val latestState: ResultItineraryUiState get() = latest
 
+    private var streamJob: Job? = null
+
     private fun emit(update: (ResultItineraryUiState) -> ResultItineraryUiState) {
         latest = update(latest)
         _streamState.tryEmit(latest)
     }
 
     fun streamItineraryGeneration(request: ItineraryRequestUiModel) {
-        viewModelScope.launch(dispatcher.io) {
+        streamJob = viewModelScope.launch(dispatcher.io) {
             // starting: mark loading (was false before—likely a bug)
             emit { it.copy(isLoading = true, error = null) }
 
@@ -128,5 +131,10 @@ class ItineraryViewModel(
                 }
             }
         }
+    }
+
+    override fun onCleared() {
+        streamJob?.cancel()
+        super.onCleared()
     }
 }
