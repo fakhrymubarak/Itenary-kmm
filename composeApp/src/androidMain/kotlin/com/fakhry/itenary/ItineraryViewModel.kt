@@ -18,8 +18,8 @@ import kotlinx.coroutines.launch
 
 
 data class StreamingDayUiModel(
-    val dayIndex: Int,
-    val dayLabel: String,
+    val dayIndex: Int = 0,
+    val dayLabel: String = "",
     val items: MutableList<TimelineItemUiModel> = mutableListOf(),
     val isComplete: Boolean = false,
 )

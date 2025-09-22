@@ -1,9 +1,11 @@
 package com.fakhry.itenary.features.itinerary.results.ui
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,9 +28,9 @@ import androidx.compose.material.icons.rounded.ElectricBike
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,9 +38,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.fakhry.itenary.features.itinerary.results.model.TimelineItemUiModel
 import com.fakhry.itenary.features.itinerary.results.model.TravelFromPrevUiModel
 import com.fakhry.itenary.features.itinerary.results.model.toUiModel
@@ -65,6 +69,7 @@ fun TimelineSection(items: MutableList<TimelineItemUiModel>) {
 
 @Composable
 fun TimelineCard(item: TimelineItemUiModel) {
+    val context = LocalContext.current
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Box(
             modifier = Modifier
@@ -89,7 +94,7 @@ fun TimelineCard(item: TimelineItemUiModel) {
                 .fillMaxWidth()
                 .weight(1f),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Column(
@@ -174,17 +179,21 @@ fun TimelineCard(item: TimelineItemUiModel) {
                         trackColor = ProgressIndicatorDefaults.circularIndeterminateTrackColor,
                         strokeCap = ProgressIndicatorDefaults.CircularDeterminateStrokeCap,
                     )
-                    // Maps button
-                    OutlinedButton(
-                        onClick = { /* Handle maps click */ }, modifier = Modifier.height(32.dp)
+                    ElevatedButton(
+                        onClick = {
+                            val intent = Intent(Intent.ACTION_VIEW, item.pinpointMapsUrl.toUri())
+                            context.startActivity(intent)
+                        },
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+                        modifier = Modifier.height(24.dp),
                     ) {
                         Icon(
                             imageVector = Icons.Default.LocationOn,
                             contentDescription = null,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(12.dp)
                         )
                         Spacer(modifier = Modifier.width(Spacing.xs))
-                        Text(text = "Maps", style = MaterialTheme.typography.labelMedium)
+                        Text(text = "Maps", style = MaterialTheme.typography.labelSmall)
                     }
                 }
             }
