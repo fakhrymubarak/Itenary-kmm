@@ -22,13 +22,14 @@ serialization = "1.9.0"
 koin = "4.1.1"
 coil = "2.7.0"
 shimmer = "1.0.5"
-voyager = "1.0.5"
+voyager = "1.0.0"
 kamel = "0.7.3"
 
 [libraries]
 inspektor = { module = "com.gyanoba.inspektor:inspektor", version.ref = "inspektor" }
+voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
+voyager-tab-navigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
-kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { module = "junit:junit", version.ref = "junit" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
@@ -72,12 +73,8 @@ orbit-compose = { module = "org.orbit-mvi:orbit-compose", version.ref = "orbitVi
 orbit-viewmodel = { module = "org.orbit-mvi:orbit-viewmodel", version.ref = "orbitViewmodel" }
 
 # Multiplatform Navigation
-voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
-voyager-screen-model = { module = "cafe.adriel.voyager:voyager-screen-model", version.ref = "voyager" }
-voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voyager" }
-voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
 
-# Multiplatform Image Loading
+ # Multiplatform Image Loading
 kamel-core = { module = "io.github.alialbaali.kamel:kamel-core", version.ref = "kamel" }
 kamel-image = { module = "io.github.alialbaali.kamel:kamel-image", version.ref = "kamel" }
 

@@ -43,8 +43,8 @@ Move all UI components from `composeApp/src/androidMain/kotlin` to `composeApp/s
   - [ ] Test component compilation
 
 ### Phase 4: Navigation Migration (Complex)
-- [ ] **4.1** Research navigation solutions
-  - [ ] Evaluate [Voyager](https://github.com/adrielcafe/voyager) for multiplatform navigation
+- [x] **4.1** Research navigation solutions
+  - [x] Evaluate [Voyager](https://github.com/adrielcafe/voyager) for multiplatform navigation (baseline dependencies added, dashboard tab wired through Voyager navigator)
   - [ ] Consider [Decompose](https://github.com/arkivanov/Decompose) for navigation
   - [ ] Or create custom navigation solution
 
@@ -63,6 +63,8 @@ Move all UI components from `composeApp/src/androidMain/kotlin` to `composeApp/s
   - [ ] Move `features/dashboard/ui/DashboardScreen.kt` to `commonMain/features/dashboard/`
   - [ ] Move `features/dashboard/ui/DashboardViewModel.kt` to `commonMain/features/dashboard/`
   - [ ] Move `features/dashboard/ui/ItenaryBottomNavigation.kt` to `commonMain/features/dashboard/`
+
+_Status:_ Dashboard screen navigation placeholder is shared via Voyager; full feature migration still pending.
 
 - [ ] **5.2** Move itinerary feature
   - [ ] Move `features/dashboard/itinerary/ui/` to `commonMain/features/dashboard/itinerary/`

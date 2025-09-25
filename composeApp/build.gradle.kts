@@ -54,6 +54,8 @@ kotlin {
             implementation(libs.orbit.viewmodel)
             implementation(libs.orbit.compose)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.voyager.navigator)
+            implementation(libs.voyager.tab.navigator)
             implementation(projects.shared)
         }
         iosMain.dependencies {
