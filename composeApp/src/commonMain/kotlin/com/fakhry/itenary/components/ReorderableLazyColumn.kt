@@ -1,4 +1,4 @@
-package com.fakhry.itenary.commons.ui
+package com.fakhry.itenary.components
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VisibilityThreshold
@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.Collections
+// import java.util.Collections
 import kotlin.math.roundToInt
 
 /**
@@ -198,8 +198,9 @@ private fun LazyListItemInfo.centerY(): Float = offset + size / 2f
 private fun <T> MutableList<T>.swap(i: Int, j: Int) {
     if (i == j) return
     if (i !in indices || j !in indices) return
-    Collections.swap(this, i, j)
+    val temp = this[i]
+    this[i] = this[j]
+    this[j] = temp
 }
 
 private fun lerp(a: Float, b: Float, t: Float) = a * (1 - t) + b * t
-

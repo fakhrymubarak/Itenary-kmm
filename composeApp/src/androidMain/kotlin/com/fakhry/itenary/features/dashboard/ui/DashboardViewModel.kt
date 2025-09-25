@@ -2,8 +2,8 @@ package com.fakhry.itenary.features.dashboard.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fakhry.itenary.commons.model.DayRequestUiModel
-import com.fakhry.itenary.commons.model.ItineraryRequestUiModel
+import com.fakhry.itenary.model.DayRequestUiModel
+import com.fakhry.itenary.model.ItineraryRequestUiModel
 import com.itenary.shared.domain.model.BannerDomain
 import com.itenary.shared.domain.repository.BannerRepository
 import com.itenary.shared.domain.repository.DomainResult

@@ -1,14 +1,8 @@
 package com.fakhry.itenary
 
 import android.app.Application
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.navigation.compose.rememberNavController
-import com.fakhry.itenary.features.dashboard.navigation.DashboardRoute
 import com.fakhry.itenary.features.dashboard.ui.DashboardViewModel
-import com.fakhry.itenary.navigation.AppNavHost
-import com.fakhry.itenary.theme.ItenaryTheme
 import com.itenary.shared.di.SharedKoinModule
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.android.ext.koin.androidContext
@@ -30,19 +24,6 @@ class ItineraryApp : Application() {
                     viewModelOf(::ItineraryViewModel)
                     viewModelOf(::DashboardViewModel)
                 }
-            )
-        }
-    }
-}
-
-@Composable
-@Preview
-fun App() {
-    ItenaryTheme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            AppNavHost(
-                navController = rememberNavController(),
-                startDestination = DashboardRoute,
             )
         }
     }

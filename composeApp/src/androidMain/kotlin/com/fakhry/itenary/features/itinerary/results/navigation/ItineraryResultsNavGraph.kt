@@ -7,7 +7,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.fakhry.itenary.commons.model.ItineraryRequestUiModel
+import com.fakhry.itenary.model.ItineraryRequestUiModel
 import com.fakhry.itenary.features.itinerary.results.ui.ResultStreamItineraryScreen
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json

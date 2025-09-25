@@ -14,11 +14,24 @@ kotlin {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions { jvmTarget.set(JvmTarget.JVM_11) }
     }
+    
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "ComposeApp"
+            isStatic = true
+        }
+    }
 
     sourceSets {
         androidMain.dependencies {
             implementation(compose.preview)
+            implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.navigation.compose)
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
             implementation(libs.kotlinx.coroutines.android)
@@ -36,11 +49,15 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(libs.androidx.navigation.compose)
+            implementation(libs.orbit.viewmodel)
+            implementation(libs.orbit.compose)
+            implementation(libs.kotlinx.serialization.json)
             implementation(projects.shared)
+        }
+        iosMain.dependencies {
+            // iOS-specific dependencies can be added here if needed
         }
         commonTest.dependencies { implementation(libs.kotlin.test) }
         androidUnitTest.dependencies {

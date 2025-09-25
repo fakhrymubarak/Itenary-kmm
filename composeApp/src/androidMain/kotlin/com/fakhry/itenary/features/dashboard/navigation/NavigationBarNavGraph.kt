@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import com.fakhry.itenary.commons.model.ItineraryRequestUiModel
+import com.fakhry.itenary.model.ItineraryRequestUiModel
 import com.fakhry.itenary.features.dashboard.food.navigation.foodNavGraph
 import com.fakhry.itenary.features.dashboard.history.navigation.historyResultsNavGraph
 import com.fakhry.itenary.features.dashboard.itinerary.navigation.ReqStreamItineraryRoute

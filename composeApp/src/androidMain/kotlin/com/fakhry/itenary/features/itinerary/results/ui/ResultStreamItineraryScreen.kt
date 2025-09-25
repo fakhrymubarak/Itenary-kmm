@@ -27,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.fakhry.itenary.ItineraryViewModel
-import com.fakhry.itenary.commons.model.ItineraryRequestUiModel
+import com.fakhry.itenary.model.ItineraryRequestUiModel
 import com.fakhry.itenary.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 

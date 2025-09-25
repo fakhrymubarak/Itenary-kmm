@@ -1,4 +1,4 @@
-package com.fakhry.itenary.commons.model
+package com.fakhry.itenary.model
 
 import com.itenary.shared.domain.model.DayRequest
 import kotlinx.serialization.Serializable

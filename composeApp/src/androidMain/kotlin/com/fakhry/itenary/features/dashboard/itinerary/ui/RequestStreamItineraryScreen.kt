@@ -21,8 +21,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.fakhry.itenary.commons.model.DayRequestUiModel
-import com.fakhry.itenary.commons.model.ItineraryRequestUiModel
+import com.fakhry.itenary.model.DayRequestUiModel
+import com.fakhry.itenary.model.ItineraryRequestUiModel
 import com.fakhry.itenary.features.dashboard.ui.DashboardSideEffect
 import com.fakhry.itenary.features.dashboard.ui.DashboardViewModel
 import com.fakhry.itenary.features.dashboard.ui.ValidationPlaceResult

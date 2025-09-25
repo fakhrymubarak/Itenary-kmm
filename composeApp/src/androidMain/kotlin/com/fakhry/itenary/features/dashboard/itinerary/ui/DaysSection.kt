@@ -52,7 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import com.fakhry.itenary.commons.model.DayRequestUiModel
+import com.fakhry.itenary.model.DayRequestUiModel
 import com.fakhry.itenary.theme.ItenaryTheme
 import com.fakhry.itenary.theme.Spacing
 import java.time.LocalTime

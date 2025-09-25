@@ -3,7 +3,7 @@ package com.fakhry.itenary.features.dashboard.itinerary.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.fakhry.itenary.commons.model.ItineraryRequestUiModel
+import com.fakhry.itenary.model.ItineraryRequestUiModel
 import com.fakhry.itenary.features.dashboard.itinerary.ui.RequestStreamItineraryScreen
 import com.fakhry.itenary.features.dashboard.navigation.Route
 import kotlinx.serialization.Serializable

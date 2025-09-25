@@ -2,8 +2,8 @@ package com.fakhry.itenary
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fakhry.itenary.commons.model.ItineraryRequestUiModel
-import com.fakhry.itenary.commons.model.toListDayRequest
+import com.fakhry.itenary.model.ItineraryRequestUiModel
+import com.fakhry.itenary.model.toListDayRequest
 import com.fakhry.itenary.features.itinerary.results.model.TimelineItemUiModel
 import com.fakhry.itenary.features.itinerary.results.model.toUiModel
 import com.itenary.shared.domain.model.ItineraryRequest
