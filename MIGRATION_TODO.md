@@ -16,10 +16,10 @@
 - [x] Provide ScreenModel bindings via Koin for both platforms
 
 ### Phase B: Feature UI Migration
-- [ ] Re-implement `ResultStreamItineraryScreen` as a shared composable using Voyager navigation
-- [ ] Port itinerary request screen (carousel, days, form) to `commonMain`
-- [ ] Migrate dashboard home surface and sections (food/history/itinerary tabs) to shared code
-- [ ] Move supporting components (bottom navigation, cards, loaders) to shared modules
+- [x] Re-implement `ResultStreamItineraryScreen` as a shared composable using Voyager navigation
+- [x] Port itinerary request screen (carousel, days, form) to `commonMain`
+- [x] Migrate dashboard home surface and sections (food/history/itinerary tabs) to shared code
+- [x] Move supporting components (bottom navigation, cards, loaders) to shared modules
 
 ### Phase C: Navigation Overhaul
 - [ ] Replace remaining Android `NavController` usages (food/history graphs) with Voyager screens/tabs
