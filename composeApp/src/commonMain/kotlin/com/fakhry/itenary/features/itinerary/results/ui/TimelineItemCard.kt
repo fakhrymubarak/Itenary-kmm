@@ -9,13 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.DirectionsWalk
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.outlined.LocalTaxi
-import androidx.compose.material.icons.outlined.PedalBike
-import androidx.compose.material.icons.rounded.CarCrash
-import androidx.compose.material.icons.rounded.ElectricBike
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -69,7 +62,7 @@ fun TimelineCard(item: TimelineItemUiModel) {
         Spacer(modifier = Modifier.height(Spacing.xs))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconText(icon = Icons.Default.Place, text = item.category)
+            Text(text = item.category, style = MaterialTheme.typography.bodySmall)
         }
 
         Spacer(modifier = Modifier.height(Spacing.sm))
@@ -83,15 +76,10 @@ fun TimelineCard(item: TimelineItemUiModel) {
 }
 
 @Composable
-private fun IconText(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String) {
+private fun IconText(text: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        androidx.compose.material3.Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(16.dp)
-        )
-        Spacer(modifier = Modifier.width(Spacing.xs))
+        // TODO: Provide multiplatform icon resource
+        Spacer(modifier = Modifier.size(Spacing.xs))
         Text(text = text, style = MaterialTheme.typography.bodySmall)
     }
 }
@@ -102,20 +90,11 @@ fun TravelInfoCard(travel: TravelFromPrevUiModel) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Spacing.xs)
     ) {
-        val icon = when (travel.mode) {
-            TravelMode.WALK -> Icons.AutoMirrored.Outlined.DirectionsWalk
-            TravelMode.TAXI -> Icons.Outlined.LocalTaxi
-            TravelMode.BIKE -> Icons.Outlined.PedalBike
-            TravelMode.CAR -> Icons.Rounded.CarCrash
-            TravelMode.RIDE_HAILING -> Icons.Rounded.ElectricBike
-            TravelMode.OTHERS, TravelMode.DEFAULT -> Icons.AutoMirrored.Outlined.DirectionsWalk
-        }
-
-        androidx.compose.material3.Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(16.dp)
+        // TODO: Provide multiplatform icon resource for travel mode
+        Text(
+            text = travel.mode.name,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.primary
         )
 
         Text(

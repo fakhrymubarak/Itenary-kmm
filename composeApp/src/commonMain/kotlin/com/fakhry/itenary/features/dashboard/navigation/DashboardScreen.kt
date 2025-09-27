@@ -49,14 +49,10 @@ object HistoryTab : Tab {
 @Composable
 private fun PlaceholderContent(title: String, description: String) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(Spacing.lg),
-        contentAlignment = Alignment.Center
+        modifier = Modifier.fillMaxSize().padding(Spacing.lg), contentAlignment = Alignment.Center
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Spacing.md)
+            horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(Spacing.md)
         ) {
             Text(text = title, style = MaterialTheme.typography.headlineMedium)
             Text(

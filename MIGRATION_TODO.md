@@ -22,12 +22,11 @@
 - [x] Move supporting components (bottom navigation, cards, loaders) to shared modules
 
 ### Phase C: Navigation Overhaul
-
-- [ ] Recreate dashboard tabs in `commonMain` (Itinerary, Food, History)
-- [ ] Share bottom navigation and remove Android `ItenaryBottomNavigation`
-- [ ] Update `MainScreen` to host Voyager tab navigator with shared tabs
-- [ ] Replace `ResultStreamItineraryScreen` with shared implementation
-- [ ] Remove remaining Android-only navigation scaffolding
+- [x] Recreate dashboard tabs in `commonMain` (Itinerary, Food, History)
+- [x] Share bottom navigation and remove Android `ItenaryBottomNavigation`
+- [x] Update `MainScreen` to host Voyager tab navigator with shared tabs
+- [x] Replace `ResultStreamItineraryScreen` with shared implementation
+- [x] Remove remaining Android-only navigation scaffolding
 
 ### Phase D: Device-Specific Glue
 - [ ] Wire Koin modules for Android/iOS to use shared ScreenModels
@@ -35,7 +34,7 @@
 - [ ] Audit image loading + shimmer dependencies and swap for multiplatform options (e.g., Kamel, custom shimmer)
 
 ### Phase E: Validation & Cleanup
-- [ ] Run `./gradlew composeApp:compileDebugKotlinAndroid`
-- [ ] Run iOS build (`composeApp:compileKotlinIosArm64` or Xcode target)
+- [x] Run `./gradlew composeApp:compileDebugKotlinAndroid`
+- [x] Run iOS build (`composeApp:compileKotlinIosArm64` or Xcode target)
 - [ ] Remove obsolete Android-only files after shared implementations verified
 - [ ] Document new module structure and update README if needed

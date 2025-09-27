@@ -1,9 +1,5 @@
 package com.fakhry.itenary.features.dashboard.ui
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.EggAlt
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -19,7 +15,7 @@ import com.fakhry.itenary.features.dashboard.navigation.ItineraryTab
 
 private data class TabItem(
     val title: String,
-    val icon: ImageVector,
+    val icon: ImageVector?,
     val tab: Tab,
 )
 
@@ -28,9 +24,9 @@ fun DashboardBottomNavigation() {
     val navigator = LocalTabNavigator.current
     val items = remember {
         listOf(
-            TabItem("Itinerary", Icons.Filled.Map, ItineraryTab),
-            TabItem("Food", Icons.Filled.EggAlt, FoodTab),
-            TabItem("History", Icons.Filled.Bookmark, HistoryTab),
+            TabItem("Itinerary", icon = null, tab = ItineraryTab),
+            TabItem("Food", icon = null, tab = FoodTab),
+            TabItem("History", icon = null, tab = HistoryTab),
         )
     }
     NavigationBar {
@@ -39,7 +35,10 @@ fun DashboardBottomNavigation() {
             NavigationBarItem(
                 selected = selected,
                 onClick = { navigator.current = item.tab },
-                icon = { Icon(item.icon, contentDescription = item.title) },
+                icon = {
+                    // TODO: Provide multiplatform icon resources
+                    item.icon?.let { Icon(it, contentDescription = item.title) }
+                },
                 label = { Text(item.title) }
             )
         }
