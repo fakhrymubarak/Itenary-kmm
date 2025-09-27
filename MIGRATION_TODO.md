@@ -5,13 +5,15 @@
 - [x] Shared dashboard entry screen through Voyager `Tab`
 - [x] Moved itinerary streaming models and card/day composables to `commonMain`
 - [x] Removed Android-only timeline UI and legacy navigation scaffolding (`NavHost`, `NavRoutes`, etc.)
+- [x] Deleted Android NavHost feature graphs (food, history, itinerary)
+- [x] Added Voyager `screenmodel` + `koin` dependencies to shared module
 
 ## 🔜 Next Steps to Reach Full KMP
 
 ### Phase A: Shared State & ScreenModels
-- [ ] Convert `ItineraryViewModel` logic into a Voyager `ScreenModel` in `commonMain`
-- [ ] Expose streaming itinerary state with immutable models and shared coroutine scope
-- [ ] Provide ScreenModel bindings via Koin for both platforms
+- [x] Convert `ItineraryViewModel` logic into a Voyager `ScreenModel` in `commonMain`
+- [x] Expose streaming itinerary state with immutable models and shared coroutine scope
+- [x] Provide ScreenModel bindings via Koin for both platforms
 
 ### Phase B: Feature UI Migration
 - [ ] Re-implement `ResultStreamItineraryScreen` as a shared composable using Voyager navigation

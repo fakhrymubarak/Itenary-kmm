@@ -1,6 +1,7 @@
 package com.fakhry.itenary.model
 
 import com.itenary.shared.domain.model.DayRequest
+import com.itenary.shared.domain.model.ItineraryRequest
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -28,3 +29,10 @@ fun List<DayRequestUiModel>.toListDayRequest() = map {
         pace = it.pace.toInt(),
     )
 }
+
+fun ItineraryRequestUiModel.toDomain() = ItineraryRequest(
+    place = place,
+    days = days.toListDayRequest(),
+    language = language,
+    llm = llm,
+)

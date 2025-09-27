@@ -56,6 +56,8 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.tab.navigator)
+            implementation(libs.voyager.screenmodel)
+            implementation(libs.voyager.koin)
             implementation(projects.shared)
         }
         iosMain.dependencies {
