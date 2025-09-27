@@ -2,11 +2,11 @@ package com.fakhry.itenary
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fakhry.itenary.model.ItineraryRequestUiModel
-import com.fakhry.itenary.model.toListDayRequest
-import com.fakhry.itenary.features.itinerary.results.model.TimelineItemUiModel
+import com.fakhry.itenary.features.itinerary.results.model.StreamingDayUiModel
+import com.fakhry.itenary.features.itinerary.results.model.StreamingItineraryUiModel
 import com.fakhry.itenary.features.itinerary.results.model.toUiModel
-import com.itenary.shared.domain.model.ItineraryRequest
+import com.fakhry.itenary.model.ItineraryRequestUiModel
+import com.fakhry.itenary.model.toDomain
 import com.itenary.shared.domain.model.StreamingEvent
 import com.itenary.shared.domain.usecase.StreamItineraryUseCase
 import com.itenary.shared.util.DispatcherProvider
@@ -16,18 +16,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
-
-data class StreamingDayUiModel(
-    val dayIndex: Int = 0,
-    val dayLabel: String = "",
-    val items: MutableList<TimelineItemUiModel> = mutableListOf(),
-    val isComplete: Boolean = false,
-)
-
-data class StreamingItineraryUiModel(
-    val days: MutableList<StreamingDayUiModel> = mutableListOf(),
-    val isComplete: Boolean = false,
-)
 
 data class ResultItineraryUiState(
     val isLoading: Boolean = false,
@@ -64,12 +52,7 @@ class ItineraryViewModel(
             // starting: mark loading (was false before—likely a bug)
             emit { it.copy(isLoading = true, error = null) }
 
-            val itineraryRequest = ItineraryRequest(
-                place = request.place,
-                days = request.days.toListDayRequest(),
-                language = request.language,
-                llm = request.llm
-            )
+            val itineraryRequest = request.toDomain()
 
             try {
                 streamItineraryUseCase(itineraryRequest).collect { event ->
@@ -78,45 +61,46 @@ class ItineraryViewModel(
                     when (event) {
                         is StreamingEvent.Init -> Unit
                         is StreamingEvent.DayStart -> emit { prev ->
-                            val cur = prev.streamingItinerary
-                            val updatedDays = cur.days.toMutableList().apply {
+                            val updatedDays = prev.streamingItinerary.days.toMutableList().apply {
                                 add(
                                     StreamingDayUiModel(
-                                        dayIndex = event.dayIndex, dayLabel = event.dayLabel
+                                        dayIndex = event.dayIndex,
+                                        dayLabel = event.dayLabel,
                                     )
                                 )
                             }
                             prev.copy(
-                                streamingItinerary = cur.copy(days = updatedDays)
+                                streamingItinerary = prev.streamingItinerary.copy(days = updatedDays)
                             )
                         }
 
                         is StreamingEvent.TimelineItemAdded -> emit { prev ->
-                            val cur = prev.streamingItinerary
-                            val updatedDays = cur.days.toMutableList()
+                            val updatedDays = prev.streamingItinerary.days.toMutableList()
                             val day = updatedDays.getOrNull(event.dayIndex)
                             if (day != null) {
-                                val updatedItems = day.items.toMutableList().apply {
-                                    add(event.item.toUiModel())
-                                }
-                                updatedDays[event.dayIndex] = day.copy(items = updatedItems)
+                                updatedDays[event.dayIndex] =
+                                    day.copy(items = day.items + event.item.toUiModel())
                             }
-                            prev.copy(streamingItinerary = cur.copy(days = updatedDays))
+                            prev.copy(
+                                streamingItinerary = prev.streamingItinerary.copy(days = updatedDays)
+                            )
                         }
 
                         is StreamingEvent.DayComplete -> emit { prev ->
-                            val cur = prev.streamingItinerary
-                            val updatedDays = cur.days.toMutableList()
+                            val updatedDays = prev.streamingItinerary.days.toMutableList()
                             if (event.dayIndex in updatedDays.indices) {
                                 val d = updatedDays[event.dayIndex]
                                 updatedDays[event.dayIndex] = d.copy(isComplete = true)
                             }
-                            prev.copy(streamingItinerary = cur.copy(days = updatedDays))
+                            prev.copy(
+                                streamingItinerary = prev.streamingItinerary.copy(days = updatedDays)
+                            )
                         }
 
                         is StreamingEvent.Complete -> emit { prev ->
                             prev.copy(
-                                isLoading = false, streamingItinerary = prev.streamingItinerary.copy(isComplete = true)
+                                isLoading = false,
+                                streamingItinerary = prev.streamingItinerary.copy(isComplete = true)
                             )
                         }
 

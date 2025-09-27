@@ -7,10 +7,12 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.fakhry.itenary.model.ItineraryRequestUiModel
 import com.fakhry.itenary.features.itinerary.results.ui.ResultStreamItineraryScreen
+import com.fakhry.itenary.model.ItineraryRequestUiModel
+import com.itenary.shared.domain.usecase.StreamItineraryUseCase
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import org.koin.compose.koinInject
 import kotlin.reflect.typeOf
 
 fun NavGraphBuilder.itineraryResultsNavGraph(
@@ -20,11 +22,12 @@ fun NavGraphBuilder.itineraryResultsNavGraph(
         typeOf<ItineraryRequestUiModel>() to CustomNavType.ItineraryRequest,
     )
 ) { backstackEntry ->
-
-    val backstackEntryRoute = backstackEntry.toRoute<ItineraryResultsRoute>()
+    val route = backstackEntry.toRoute<ItineraryResultsRoute>()
+    val streamUseCase: StreamItineraryUseCase = koinInject()
     ResultStreamItineraryScreen(
-        itineraryRequestUiModel = backstackEntryRoute.itineraryRequest,
+        itineraryRequest = route.itineraryRequest,
         onNavigateBack = onBackPressed,
+        streamItineraryUseCase = streamUseCase,
     )
 }
 

@@ -58,6 +58,7 @@ kotlin {
             implementation(libs.voyager.tab.navigator)
             implementation(libs.voyager.screenmodel)
             implementation(libs.voyager.koin)
+            implementation(libs.koin.compose)
             implementation(projects.shared)
         }
         iosMain.dependencies {
