@@ -13,6 +13,7 @@
         <domain includeSubdomains="true">10.5.49.222</domain>
         <domain includeSubdomains="true">172.17.23.245</domain>
         <domain includeSubdomains="true">172.17.22.128</domain>
+        <domain includeSubdomains="true">192.168.100.120</domain>
     </domain-config>
     <base-config cleartextTrafficPermitted="false">
         <trust-anchors>

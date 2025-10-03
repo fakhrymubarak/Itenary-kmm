@@ -2,7 +2,6 @@ package com.fakhry.itenary
 
 import android.app.Application
 import androidx.compose.runtime.Composable
-import com.fakhry.itenary.features.dashboard.ui.DashboardViewModel
 import com.itenary.shared.di.SharedKoinModule
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.android.ext.koin.androidContext
@@ -22,7 +21,6 @@ class ItineraryApp : Application() {
                 SharedKoinModule,
                 module {
                     viewModelOf(::ItineraryViewModel)
-                    viewModelOf(::DashboardViewModel)
                 }
             )
         }

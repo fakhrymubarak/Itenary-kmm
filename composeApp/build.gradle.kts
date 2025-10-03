@@ -23,6 +23,7 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            binaryOptions["bundleId"] = "com.fakhry.itenary.composeapp"
         }
     }
 
@@ -51,6 +52,7 @@ kotlin {
             implementation(compose.components.resources)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.androidx.lifecycle.viewmodelSavedstate)
             implementation(libs.orbit.viewmodel)
             implementation(libs.orbit.compose)
             implementation(libs.kotlinx.serialization.json)
@@ -59,6 +61,7 @@ kotlin {
             implementation(libs.voyager.screenmodel)
             implementation(libs.voyager.koin)
             implementation(libs.koin.compose)
+            implementation(libs.koin.core)
             implementation(projects.shared)
         }
         iosMain.dependencies {

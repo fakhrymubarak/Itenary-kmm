@@ -22,17 +22,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.fakhry.itenary.components.DotsIndicator
 import com.fakhry.itenary.components.ShimmerBox
 import com.fakhry.itenary.components.ShimmerCircle
-import com.fakhry.itenary.features.dashboard.ui.UiState
+import com.fakhry.itenary.features.dashboard.model.UiState
 import com.fakhry.itenary.theme.Spacing
 import com.itenary.shared.domain.model.BannerDomain
-import com.valentinilk.shimmer.shimmer
 
 @Composable
 fun CarouselSection(
@@ -49,15 +45,20 @@ fun CarouselSection(
     ) {
         when (state) {
             UiState.Loading -> ShimmerBannerSection()
-            is UiState.Error -> ErrorBannerSection(false, onRetrySection)
-            UiState.NetworkError -> ErrorBannerSection(true, onRetrySection)
+            is UiState.Error -> ErrorBannerSection(isNetwork = false, onRetrySection = onRetrySection)
+            UiState.NetworkError -> ErrorBannerSection(isNetwork = true, onRetrySection = onRetrySection)
             is UiState.Success -> BannerCarousel(state.data, onClickBanner)
         }
     }
 }
 
 @Composable
-fun BannerCarousel(banners: List<BannerDomain>, onClickBanner: (String) -> Unit) {
+private fun BannerCarousel(banners: List<BannerDomain>, onClickBanner: (String) -> Unit) {
+    if (banners.isEmpty()) {
+        EmptyCarouselPlaceholder()
+        return
+    }
+
     val pagerState = rememberPagerState(pageCount = { banners.size })
 
     Box(
@@ -71,64 +72,73 @@ fun BannerCarousel(banners: List<BannerDomain>, onClickBanner: (String) -> Unit)
                 .align(Alignment.Center),
             state = pagerState
         ) { page ->
-            AsyncImage(
-                model = banners[page].bannerImageUrl,
-                contentDescription = null,
+            val banner = banners[page]
+            BannerImage(
+                url = banner.bannerImageUrl,
+                contentDescription = banner.title,
                 modifier = Modifier
                     .fillMaxSize()
-                    .clickable { onClickBanner(banners[page].title) },
-                contentScale = ContentScale.Crop,
+                    .clickable { onClickBanner(banner.title) },
             )
         }
 
         DotsIndicator(
             modifier = Modifier.align(Alignment.BottomCenter),
-            totalDots = banners.size, selectedIndex = pagerState.currentPage
+            totalDots = banners.size,
+            selectedIndex = pagerState.currentPage
         )
     }
 }
 
-
 @Composable
-fun ShimmerBannerSection() {
+private fun EmptyCarouselPlaceholder() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .shimmer()
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+    )
+}
+
+@Composable
+private fun ShimmerBannerSection() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .platformShimmer()
             .background(MaterialTheme.colorScheme.surfaceVariant)
     ) {
-        // Add some content-like shimmer elements to make it more realistic
         Column(
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .padding(Spacing.md),
             verticalArrangement = Arrangement.spacedBy(Spacing.sm)
         ) {
-            // Title shimmer
             ShimmerBox(modifier = Modifier.fillMaxWidth(0.6f), height = 24.dp)
-
-            // Subtitle shimmer
             ShimmerBox(modifier = Modifier.fillMaxWidth(0.4f), height = 16.dp)
         }
 
-        // Page indicators shimmer at bottom
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(Spacing.sm),
             horizontalArrangement = Arrangement.spacedBy(Spacing.xs)
-        ) { repeat(3) { ShimmerCircle(size = 8.dp) } }
+        ) {
+            repeat(3) { ShimmerCircle(size = 8.dp) }
+        }
     }
 }
 
-
 @Composable
-fun ErrorBannerSection(
-    isNetwork: Boolean = true,
-    onRetrySection: () -> Unit = {},
+private fun ErrorBannerSection(
+    isNetwork: Boolean,
+    onRetrySection: () -> Unit,
 ) {
-    val message =
-        if (isNetwork) "Network Error. Please try again." else "Something went wrong. Please try again."
+    val message = if (isNetwork) {
+        "Network error. Please try again."
+    } else {
+        "Something went wrong. Please try again."
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -142,7 +152,7 @@ fun ErrorBannerSection(
             Text(message, modifier = Modifier.weight(1f))
             Spacer(Modifier.width(Spacing.sm))
             Button(
-                onRetrySection,
+                onClick = onRetrySection,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.error,
                     contentColor = MaterialTheme.colorScheme.onError,
@@ -154,22 +164,7 @@ fun ErrorBannerSection(
     }
 }
 
-@Preview()
+expect fun Modifier.platformShimmer(): Modifier
+
 @Composable
-private fun ShimmerBannerSectionPreview() {
-    CarouselSection(state = UiState.Loading)
-}
-
-@Preview()
-@Composable
-private fun ErrorBannerSectionPreview() {
-    CarouselSection(state = UiState.NetworkError)
-}
-
-
-@Preview()
-@Composable
-private fun BannerCarouselSectionPreview() {
-    CarouselSection(state = UiState.Success(data = listOf(BannerDomain(), BannerDomain(), BannerDomain())))
-}
-
+expect fun BannerImage(url: String?, contentDescription: String?, modifier: Modifier)

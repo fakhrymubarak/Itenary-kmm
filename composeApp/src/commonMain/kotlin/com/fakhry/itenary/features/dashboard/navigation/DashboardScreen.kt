@@ -14,17 +14,9 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.fakhry.itenary.theme.Spacing
 
-private fun tabOptions(index: UShort, title: String): TabOptions = TabOptions(index = index, title = title, icon = null)
+internal fun tabOptions(index: UShort, title: String): TabOptions = TabOptions(index = index, title = title, icon = null)
 
-object ItineraryTab : Tab {
-    override val options: TabOptions
-        @Composable get() = tabOptions(0u, "Itinerary")
-
-    @Composable
-    override fun Content() {
-        PlaceholderContent(title = "Itinerary", description = "Shared itinerary request goes here")
-    }
-}
+expect object ItineraryTab : Tab
 
 object FoodTab : Tab {
     override val options: TabOptions
@@ -47,7 +39,7 @@ object HistoryTab : Tab {
 }
 
 @Composable
-private fun PlaceholderContent(title: String, description: String) {
+fun PlaceholderContent(title: String, description: String) {
     Box(
         modifier = Modifier.fillMaxSize().padding(Spacing.lg), contentAlignment = Alignment.Center
     ) {

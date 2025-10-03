@@ -16,7 +16,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-const val BASE_URL = "http://172.17.22.128:8080"
+const val BASE_URL = "http://10.0.2.2:8080"
 val SharedKoinModule = module {
     single<HttpClient> { HttpClientFactory(true).create(get()) }
     single { DispatcherProvider() }
