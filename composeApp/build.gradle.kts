@@ -28,27 +28,30 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.androidx.material.icons.extended)
             implementation(libs.shimmer)
-            implementation(libs.inspektor)
+            implementation(libs.androidx.lifecycle.viewmodelCompose)
+            implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.androidx.navigation.compose)
+        }
+        androidUnitTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.koin.core)
+            implementation(libs.mockk)
+            implementation(libs.slf4j.simple)
         }
         commonMain.dependencies {
+            implementation(projects.shared)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
-            implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(libs.androidx.navigation.compose)
-            implementation(projects.shared)
+            implementation(libs.inspektor)
+
         }
-        commonTest.dependencies { implementation(libs.kotlin.test) }
-        androidUnitTest.dependencies {
+        commonTest.dependencies {
             implementation(libs.kotlin.test)
-            implementation(libs.kotlinx.coroutines.test)
-            implementation(libs.koin.core)
-            implementation("io.mockk:mockk:1.13.8")
-            implementation("org.slf4j:slf4j-simple:1.7.36")
         }
     }
 }

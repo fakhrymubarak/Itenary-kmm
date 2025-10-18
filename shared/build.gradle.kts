@@ -36,7 +36,6 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.serialization.kotlinx.json)
-            implementation(libs.inspektor)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -45,6 +44,8 @@ kotlin {
         }
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
+            // Inspektor is only used on Android to avoid K/N ABI mismatches on iOS
+            implementation(libs.inspektor)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)

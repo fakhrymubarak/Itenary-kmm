@@ -1,8 +1,4 @@
 package com.itenary.shared.data.remote
-
-import com.gyanoba.inspektor.Inspektor
-import com.gyanoba.inspektor.LogLevel.HEADERS
-import com.gyanoba.inspektor.UnstableInspektorAPI
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngineFactory
 import io.ktor.client.plugins.HttpTimeout
@@ -18,7 +14,6 @@ import kotlin.time.Duration.Companion.days
 class HttpClientFactory(
     private val enableLogging: Boolean = false,
 ) {
-    @OptIn(UnstableInspektorAPI::class)
     fun create(engine: HttpClientEngineProvider): HttpClient {
         return HttpClient(engine.provide()) {
             install(ContentNegotiation) {
@@ -36,14 +31,8 @@ class HttpClientFactory(
                 requestTimeoutMillis = 30_000
                 socketTimeoutMillis = 30_000
             }
-            install(Inspektor) {
-                level = HEADERS
-                maxContentLength = 100_000
-                filter { request -> request.url.host.contains("example.com") }
-                sanitizeHeader { header -> header == "Authorization" }
-                showNotifications = true
-                retentionDuration = 30.days
-            }
+            // Platform-specific inspector (Android only). No-op on iOS.
+            installInspektor(this)
 
             if (enableLogging) {
                 install(Logging) {
@@ -62,5 +51,4 @@ class HttpClientFactory(
 interface HttpClientEngineProvider {
     fun provide(): HttpClientEngineFactory<*>
 }
-
 
