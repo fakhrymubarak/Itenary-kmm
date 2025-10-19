@@ -1,5 +1,7 @@
 package com.itenary.shared.data.remote
 
+import com.itenary.shared.data.database.ItineraryDao
+import com.itenary.shared.data.database.ItineraryEntity
 import com.itenary.shared.data.mappers.SSEEventMapper
 import com.itenary.shared.data.mappers.toDto
 import com.itenary.shared.domain.model.ItineraryDomain
@@ -17,11 +19,13 @@ import io.ktor.http.contentType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlin.coroutines.cancellation.CancellationException
 
 class ItineraryStreamRepositoryImpl(
     private val httpClient: HttpClient,
     private val sseEventMapper: SSEEventMapper,
     private val baseUrl: String,
+    private val itineraryDao: ItineraryDao,
 ) : ItineraryStreamRepository {
 
     override suspend fun streamItineraryGeneration(
@@ -45,7 +49,17 @@ class ItineraryStreamRepositoryImpl(
         }
     }
 
-    override suspend fun cacheItinerary(itinerary: ItineraryDomain): DomainResult<Boolean> {
-        return DomainResult.Success(true)
-    }
+    override suspend fun cacheItinerary(itinerary: ItineraryDomain): DomainResult<Boolean> =
+        try {
+            val id = itineraryDao.insert(ItineraryEntity(itinerary = itinerary))
+            if (id > 0) {
+                DomainResult.Success(true)
+            } else {
+                DomainResult.Error(message = "Failed to cache itinerary", code = -1)
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            DomainResult.Error(message = "DB error: ${e.message}", code = -1)
+        }
 }
