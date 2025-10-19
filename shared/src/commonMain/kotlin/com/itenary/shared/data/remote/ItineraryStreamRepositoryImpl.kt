@@ -19,7 +19,6 @@ import io.ktor.http.contentType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlin.coroutines.cancellation.CancellationException
 
 class ItineraryStreamRepositoryImpl(
     private val httpClient: HttpClient,
@@ -57,7 +56,7 @@ class ItineraryStreamRepositoryImpl(
             } else {
                 DomainResult.Error(message = "Failed to cache itinerary", code = -1)
             }
-        } catch (e: CancellationException) {
+        } catch (e: kotlinx.coroutines.CancellationException) {
             throw e
         } catch (e: Exception) {
             DomainResult.Error(message = "DB error: ${e.message}", code = -1)

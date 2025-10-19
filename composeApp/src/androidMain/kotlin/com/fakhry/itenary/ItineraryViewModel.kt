@@ -6,16 +6,22 @@ import com.fakhry.itenary.commons.model.ItineraryRequestUiModel
 import com.fakhry.itenary.commons.model.toListDayRequest
 import com.fakhry.itenary.features.itinerary.results.model.TimelineItemUiModel
 import com.fakhry.itenary.features.itinerary.results.model.toUiModel
+import com.itenary.shared.domain.model.DayDomain
+import com.itenary.shared.domain.model.ItineraryDomain
 import com.itenary.shared.domain.model.ItineraryRequest
+import com.itenary.shared.domain.model.PriceDomain
 import com.itenary.shared.domain.model.StreamingEvent
+import com.itenary.shared.domain.model.TimelineItemDomain
+import com.itenary.shared.domain.model.TravelFromPrevDomain
+import com.itenary.shared.domain.repository.ItineraryStreamRepository
 import com.itenary.shared.domain.usecase.StreamItineraryUseCase
 import com.itenary.shared.util.DispatcherProvider
+import com.itenary.shared.util.DomainResult
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-
 
 data class StreamingDayUiModel(
     val dayIndex: Int,
@@ -39,6 +45,7 @@ data class ResultItineraryUiState(
 class ItineraryViewModel(
     private val streamItineraryUseCase: StreamItineraryUseCase,
     private val dispatcher: DispatcherProvider,
+    private val itineraryRepository: ItineraryStreamRepository,
 ) : ViewModel() {
 
     // Non-conflated stream of UI states
@@ -134,8 +141,49 @@ class ItineraryViewModel(
     }
 
     fun saveToLocalStorage() {
+        val snapshot = latestState.streamingItinerary
+        if (snapshot.days.isEmpty()) return
 
+        val domain = ItineraryDomain(
+            days = snapshot.days.map { day ->
+                DayDomain(
+                    dayIndex = day.dayIndex,
+                    dayLabel = day.dayLabel,
+                    items = day.items.map { it.toDomain() }.toMutableList()
+                )
+            }.toMutableList()
+        )
+
+        viewModelScope.launch(dispatcher.io) {
+            when (val result = itineraryRepository.cacheItinerary(domain)) {
+                is DomainResult.Success -> Unit
+                is DomainResult.Error -> emit { it.copy(error = result.message ?: "Save failed") }
+                is DomainResult.NetworkError -> emit { it.copy(error = "Network error while saving") }
+            }
+        }
     }
+
+    private fun TimelineItemUiModel.toDomain(): TimelineItemDomain = TimelineItemDomain(
+        timeEnd = timeEnd,
+        timeStart = timeStart,
+        lng = lng,
+        lat = lat,
+        expenseEstimation = PriceDomain(),
+        pinpointMapsUrl = pinpointMapsUrl,
+        name = name,
+        shortDesc = shortDesc,
+        category = category,
+        travelFromPrev = TravelFromPrevDomain(
+            mode = travelFromPrev.mode,
+            modeStr = "",
+            // Lost details in UI model; store defaults
+            fareEstimate = PriceDomain(),
+            distanceKm = 0f,
+            durationMin = 0,
+        ),
+        source = source,
+        confidence = confidence,
+    )
 
     override fun onCleared() {
         streamJob?.cancel()
