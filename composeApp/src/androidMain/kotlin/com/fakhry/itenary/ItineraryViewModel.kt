@@ -61,6 +61,7 @@ class ItineraryViewModel(
     private var latest: ResultItineraryUiState = ResultItineraryUiState()
     val latestState: ResultItineraryUiState get() = latest
 
+    private lateinit var place: String
     private var streamJob: Job? = null
 
     private fun emit(update: (ResultItineraryUiState) -> ResultItineraryUiState) {
@@ -70,9 +71,9 @@ class ItineraryViewModel(
 
     fun streamItineraryGeneration(request: ItineraryRequestUiModel) {
         streamJob = viewModelScope.launch(dispatcher.io) {
-            // starting: mark loading (was false before—likely a bug)
             emit { it.copy(isLoading = true, error = null) }
 
+            place = request.place
             val itineraryRequest = ItineraryRequest(
                 place = request.place,
                 days = request.days.toListDayRequest(),
@@ -157,13 +158,15 @@ class ItineraryViewModel(
         )
 
         viewModelScope.launch(dispatcher.io) {
-            when (val result = itineraryRepository.cacheItinerary(domain)) {
+            when (val result = itineraryRepository.cacheItinerary(place.mapToKey(), domain)) {
                 is DomainResult.Success -> emit { it.copy(saveSuccess = true, saveError = null) }
                 is DomainResult.Error -> emit { it.copy(saveError = result.message ?: "Save failed") }
                 is DomainResult.NetworkError -> emit { it.copy(saveError = "Network error while saving") }
             }
         }
     }
+
+    private fun String.mapToKey() = this.replace(", ", "_").lowercase()
 
     fun consumeSaveResult() {
         emit { it.copy(saveSuccess = false) }

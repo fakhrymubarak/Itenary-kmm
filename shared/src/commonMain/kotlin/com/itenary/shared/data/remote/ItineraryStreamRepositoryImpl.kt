@@ -50,9 +50,9 @@ class ItineraryStreamRepositoryImpl(
         }
     }
 
-    override suspend fun cacheItinerary(itinerary: ItineraryDomain): DomainResult<Boolean> =
+    override suspend fun cacheItinerary(key: String, itinerary: ItineraryDomain): DomainResult<Boolean> =
         try {
-            val id = itineraryDao.insert(ItineraryEntity(itinerary = itinerary))
+            val id = itineraryDao.insert(ItineraryEntity(id= key, itinerary = itinerary))
             if (id > 0) {
                 DomainResult.Success(true)
             } else {

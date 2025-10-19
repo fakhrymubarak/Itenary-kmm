@@ -7,8 +7,8 @@ import com.itenary.shared.domain.model.ItineraryDomain
 
 @Entity(tableName = "itinerary")
 data class ItineraryEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    @PrimaryKey(autoGenerate = false)
+    val id: String,
 
     @ColumnInfo(name = "data")
     val itinerary: ItineraryDomain,

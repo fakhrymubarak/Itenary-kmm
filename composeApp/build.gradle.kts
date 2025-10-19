@@ -32,6 +32,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.navigation.compose)
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
         }
         androidUnitTest.dependencies {
             implementation(libs.kotlin.test)
