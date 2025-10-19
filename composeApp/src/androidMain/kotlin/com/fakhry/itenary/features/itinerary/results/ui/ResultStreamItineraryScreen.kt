@@ -23,12 +23,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +54,8 @@ fun ResultStreamItineraryScreen(
     val state by viewModel.streamingUiState.collectAsStateWithLifecycle(
         initialValue = viewModel.latestState
     )
+    val snackbarHostState = remember { SnackbarHostState() }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -68,8 +73,22 @@ fun ResultStreamItineraryScreen(
                         containerColor = MaterialTheme.colorScheme.surface
                     )
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
+        LaunchedEffect(state.saveSuccess) {
+            if (state.saveSuccess) {
+                snackbarHostState.showSnackbar("Itinerary saved locally")
+                viewModel.consumeSaveResult()
+            }
+        }
+        LaunchedEffect(state.saveError) {
+            val msg = state.saveError
+            if (!msg.isNullOrBlank()) {
+                snackbarHostState.showSnackbar(msg)
+                viewModel.consumeSaveError()
+            }
+        }
         Box(
             modifier = Modifier
                 .fillMaxSize()

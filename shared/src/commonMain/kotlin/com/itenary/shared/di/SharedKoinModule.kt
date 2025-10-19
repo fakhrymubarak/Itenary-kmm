@@ -1,8 +1,5 @@
 package com.itenary.shared.di
 
-import com.itenary.shared.data.database.AppDatabase
-import com.itenary.shared.data.database.AppDatabaseConstructor
-import com.itenary.shared.data.database.ItineraryDao
 import com.itenary.shared.data.mappers.SSEEventMapper
 import com.itenary.shared.data.remote.BannerRepositoryImpl
 import com.itenary.shared.data.remote.HttpClientEngineProvider
@@ -27,11 +24,14 @@ val SharedKoinModule = module {
     singleOf(::PlatformHttpEngine) bind HttpClientEngineProvider::class
     factoryOf(::SSEEventMapper)
 
-    // Room database + DAO
-    single<AppDatabase> { AppDatabaseConstructor.initialize() }
-    single<ItineraryDao> { get<AppDatabase>().itineraryDao() }
-
-    factory<ItineraryStreamRepository> { ItineraryStreamRepositoryImpl(get(), get(), BASE_URL, get()) }
+    factory<ItineraryStreamRepository> {
+        ItineraryStreamRepositoryImpl(
+            httpClient = get(),
+            sseEventMapper = get(),
+            baseUrl = BASE_URL,
+            itineraryDao = get()
+        )
+    }
     factory<BannerRepository> { BannerRepositoryImpl(get(), BASE_URL) }
 
     factoryOf(::StreamItineraryUseCase)

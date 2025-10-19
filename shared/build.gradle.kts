@@ -51,6 +51,7 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.inspektor)
             implementation(libs.androidx.room.sqlite.wrapper)
+            implementation(libs.koin.android)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)

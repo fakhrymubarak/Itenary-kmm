@@ -1,5 +1,6 @@
 package com.itenary.shared.data.remote
 
+import com.diamondedge.logging.logging
 import com.itenary.shared.data.database.ItineraryDao
 import com.itenary.shared.data.database.ItineraryEntity
 import com.itenary.shared.data.mappers.SSEEventMapper
@@ -16,6 +17,7 @@ import io.ktor.client.request.url
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -54,11 +56,14 @@ class ItineraryStreamRepositoryImpl(
             if (id > 0) {
                 DomainResult.Success(true)
             } else {
+                logging().e { "Failed to cache itinerary" }
                 DomainResult.Error(message = "Failed to cache itinerary", code = -1)
             }
-        } catch (e: kotlinx.coroutines.CancellationException) {
+        } catch (e: CancellationException) {
+            logging().e(err = e) { "Error caching itinerary: ${e.message}" }
             throw e
         } catch (e: Exception) {
+            logging().e(err = e) { "Error caching itinerary: ${e.message}" }
             DomainResult.Error(message = "DB error: ${e.message}", code = -1)
         }
 }

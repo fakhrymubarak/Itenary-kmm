@@ -40,6 +40,8 @@ data class ResultItineraryUiState(
     val streamingItinerary: StreamingItineraryUiModel = StreamingItineraryUiModel(),
     val isComplete: Boolean = false,
     val error: String? = null,
+    val saveSuccess: Boolean = false,
+    val saveError: String? = null,
 )
 
 class ItineraryViewModel(
@@ -156,11 +158,19 @@ class ItineraryViewModel(
 
         viewModelScope.launch(dispatcher.io) {
             when (val result = itineraryRepository.cacheItinerary(domain)) {
-                is DomainResult.Success -> Unit
-                is DomainResult.Error -> emit { it.copy(error = result.message ?: "Save failed") }
-                is DomainResult.NetworkError -> emit { it.copy(error = "Network error while saving") }
+                is DomainResult.Success -> emit { it.copy(saveSuccess = true, saveError = null) }
+                is DomainResult.Error -> emit { it.copy(saveError = result.message ?: "Save failed") }
+                is DomainResult.NetworkError -> emit { it.copy(saveError = "Network error while saving") }
             }
         }
+    }
+
+    fun consumeSaveResult() {
+        emit { it.copy(saveSuccess = false) }
+    }
+
+    fun consumeSaveError() {
+        emit { it.copy(saveError = null) }
     }
 
     private fun TimelineItemUiModel.toDomain(): TimelineItemDomain = TimelineItemDomain(
