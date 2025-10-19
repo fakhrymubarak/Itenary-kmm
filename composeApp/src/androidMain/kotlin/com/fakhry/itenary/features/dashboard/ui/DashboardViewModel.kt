@@ -6,7 +6,7 @@ import com.fakhry.itenary.commons.model.DayRequestUiModel
 import com.fakhry.itenary.commons.model.ItineraryRequestUiModel
 import com.itenary.shared.domain.model.BannerDomain
 import com.itenary.shared.domain.repository.BannerRepository
-import com.itenary.shared.domain.repository.DomainResult
+import com.itenary.shared.util.DomainResult
 import com.itenary.shared.util.DispatcherProvider
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.ContainerHost

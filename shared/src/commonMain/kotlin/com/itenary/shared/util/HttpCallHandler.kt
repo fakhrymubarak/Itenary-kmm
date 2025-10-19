@@ -1,6 +1,6 @@
 package com.itenary.shared.util
 
-import com.itenary.shared.domain.repository.DomainResult
+import com.itenary.shared.util.DomainResult
 import io.ktor.client.call.body
 import io.ktor.client.network.sockets.SocketTimeoutException
 import io.ktor.client.plugins.ResponseException
