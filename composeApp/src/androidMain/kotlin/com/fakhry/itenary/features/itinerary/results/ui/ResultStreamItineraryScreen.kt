@@ -47,10 +47,7 @@ fun ResultStreamItineraryScreen(
     onNavigateBack: () -> Unit,
     viewModel: ItineraryViewModel = koinViewModel(),
 ) {
-    // TODO-ASK. CAN I USE ORBIT MVI HERE?
     LaunchedEffect(Unit) { viewModel.streamItineraryGeneration(itineraryRequestUiModel) }
-
-    // TODO-ASK. WHAT THE DIFFERENCE BETWEEN THIS AND REGULAR COLLECT
     val state by viewModel.streamingUiState.collectAsStateWithLifecycle(
         initialValue = viewModel.latestState
     )
@@ -133,12 +130,20 @@ fun ResultStreamItineraryScreen(
                                     }
                                 }
                             }
+
+                            item {
+                                Button(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    onClick = viewModel::saveToLocalStorage,
+                                ) {
+                                    Text("Save Itinerary", softWrap = false)
+                                }
+                            }
                         }
                     }
                 }
 
                 state.error != null -> {
-                    // Error state
                     Column(
                         modifier = Modifier
                             .fillMaxSize()

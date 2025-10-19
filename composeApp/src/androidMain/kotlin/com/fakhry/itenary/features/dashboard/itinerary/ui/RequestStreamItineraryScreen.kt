@@ -20,13 +20,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.fakhry.itenary.commons.model.DayRequestUiModel
 import com.fakhry.itenary.commons.model.ItineraryRequestUiModel
 import com.fakhry.itenary.features.dashboard.ui.DashboardSideEffect
 import com.fakhry.itenary.features.dashboard.ui.DashboardViewModel
 import com.fakhry.itenary.features.dashboard.ui.ValidationPlaceResult
-import com.fakhry.itenary.theme.ItenaryTheme
 import com.fakhry.itenary.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
@@ -110,16 +108,10 @@ fun RequestStreamItineraryScreen(
                         .padding(horizontal = Spacing.sm),
                     onClick = viewModel::generateItinerary,
                     enabled = state.validationPlaceResult == ValidationPlaceResult.VALID
-                ) { Text("Generate Itinerary") }
+                ) {
+                    Text("Generate Itinerary")
+                }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-private fun RequestStreamItineraryScreenPreview() {
-    ItenaryTheme {
-        RequestStreamItineraryScreen()
     }
 }

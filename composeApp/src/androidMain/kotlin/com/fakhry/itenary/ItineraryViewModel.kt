@@ -133,6 +133,10 @@ class ItineraryViewModel(
         }
     }
 
+    fun saveToLocalStorage() {
+
+    }
+
     override fun onCleared() {
         streamJob?.cancel()
         super.onCleared()
