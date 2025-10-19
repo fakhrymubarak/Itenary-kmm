@@ -1,5 +1,15 @@
 package com.itenary.shared.domain.model
 
+data class ItineraryDomain(
+    val days: MutableList<DayDomain> = mutableListOf(),
+)
+
+data class DayDomain(
+    val dayIndex: Int,
+    val dayLabel: String,
+    val items: MutableList<TimelineItemDomain> = mutableListOf(),
+)
+
 data class TimelineItemDomain(
     val timeEnd: String = "",
     val timeStart: String = "",
