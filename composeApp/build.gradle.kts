@@ -12,7 +12,7 @@ plugins {
 kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
-        compilerOptions { jvmTarget.set(JvmTarget.JVM_11) }
+        compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
     }
 
     sourceSets {
@@ -21,6 +21,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
+            implementation(libs.kmlogging)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.coil.compose)
             implementation(libs.orbit.viewmodel)
@@ -80,8 +81,8 @@ android {
         buildConfig = true
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 

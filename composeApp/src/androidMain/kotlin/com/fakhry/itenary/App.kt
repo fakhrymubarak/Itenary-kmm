@@ -5,6 +5,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.rememberNavController
+import com.diamondedge.logging.KmLogging
+import com.diamondedge.logging.LogLevel
 import com.fakhry.itenary.features.dashboard.navigation.DashboardRoute
 import com.fakhry.itenary.features.dashboard.ui.DashboardViewModel
 import com.fakhry.itenary.navigation.AppNavHost
@@ -20,6 +22,8 @@ import org.koin.dsl.module
 class ItineraryApp : Application() {
     override fun onCreate() {
         super.onCreate()
+
+        KmLogging.setLogLevel(if (BuildConfig.DEBUG) LogLevel.Verbose else LogLevel.Off)
 
         startKoin {
             androidContext(this@ItineraryApp)

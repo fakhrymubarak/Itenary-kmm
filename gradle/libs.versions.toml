@@ -27,6 +27,7 @@ coil = "2.7.0"
 shimmer = "1.0.5"
 slf4jSimple = "1.7.36"
 sqlite = "2.6.1"
+kmlogging = "2.1.0"
 
 [libraries]
 inspektor = { module = "com.gyanoba.inspektor:inspektor", version.ref = "inspektor" }
@@ -82,6 +83,7 @@ androidx-room-sqlite-wrapper = { module = "androidx.room:room-sqlite-wrapper", v
 orbit-compose = { module = "org.orbit-mvi:orbit-compose", version.ref = "orbitViewmodel" }
 orbit-viewmodel = { module = "org.orbit-mvi:orbit-viewmodel", version.ref = "orbitViewmodel" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4jSimple" }
+kmlogging = { module = "com.diamondedge:logging", version.ref = "kmlogging" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
