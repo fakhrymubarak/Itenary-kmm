@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.rememberNavController
+import com.fakhry.itenary.features.dashboard.history.ui.HistoryResultsViewModel
 import com.fakhry.itenary.features.dashboard.navigation.DashboardRoute
 import com.fakhry.itenary.features.dashboard.ui.DashboardViewModel
 import com.fakhry.itenary.navigation.AppNavHost
@@ -32,6 +33,7 @@ class ItineraryApp : Application() {
                 module {
                     viewModelOf(::ItineraryViewModel)
                     viewModelOf(::DashboardViewModel)
+                    viewModelOf(::HistoryResultsViewModel)
                 }
             )
         }

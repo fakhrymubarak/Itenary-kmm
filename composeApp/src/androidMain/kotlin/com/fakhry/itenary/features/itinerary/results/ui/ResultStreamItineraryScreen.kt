@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -55,6 +56,8 @@ fun ResultStreamItineraryScreen(
         initialValue = viewModel.latestState
     )
     val snackbarHostState = remember { SnackbarHostState() }
+
+    val listState = rememberLazyListState()
 
     Scaffold(
         topBar = {
@@ -113,13 +116,19 @@ fun ResultStreamItineraryScreen(
 
                 state.streamingItinerary.days.isNotEmpty() -> {
                     // Streaming results
+                    val streamingItinerary = state.streamingItinerary
+                    LaunchedEffect(streamingItinerary.days.size) {
+                        if (streamingItinerary.days.isNotEmpty()) {
+                            listState.animateScrollToItem(streamingItinerary.days.lastIndex)
+                        }
+                    }
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(Spacing.md),
-                        verticalArrangement = Arrangement.spacedBy(Spacing.md)
+                        verticalArrangement = Arrangement.spacedBy(Spacing.md),
+                        state = listState
                     ) {
-                        val streamingItinerary = state.streamingItinerary
                         items(streamingItinerary.days) { day -> DayCard(day = day) }
 
                         // Show completion status

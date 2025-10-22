@@ -17,6 +17,7 @@ fun NavigationBarNavGraph(
     navHostController: NavHostController,
     innerPadding: PaddingValues,
     onNavigateToDetails: (ItineraryRequestUiModel) -> Unit,
+    onNavigateToHistoryDetails: (String) -> Unit,
 ) {
     NavHost(
         modifier = Modifier.padding(innerPadding),

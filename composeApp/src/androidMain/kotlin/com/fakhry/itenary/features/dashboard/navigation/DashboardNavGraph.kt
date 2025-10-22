@@ -9,11 +9,13 @@ import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.dashboardNavGraph(
     onNavigateToDetails: (itineraryRequest: ItineraryRequestUiModel) -> Unit,
+    onNavigateToHistoryDetails: (String) -> Unit,
 ) {
     composable<DashboardRoute> {
         DashboardScreen(
             navHostController = rememberNavController(),
             onNavigateToDetails = onNavigateToDetails,
+            onNavigateToHistoryDetails = onNavigateToHistoryDetails,
         )
     }
 }

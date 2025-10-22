@@ -57,4 +57,18 @@ class ItineraryStreamRepositoryImpl(
         } catch (e: Exception) {
             DomainResult.Error(message = "DB error: ${e.message}")
         }
+
+    override suspend fun getSavedItinerary(): DomainResult<List<ItineraryDomain>> =
+        try {
+            val cached = itineraryDao.getAll().map { it.itinerary }
+            if (cached.isNotEmpty()) {
+                DomainResult.Success(cached)
+            } else {
+                DomainResult.Error("No saved itinerary found")
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            DomainResult.Error(message = "DB error: ${e.message}")
+        }
 }

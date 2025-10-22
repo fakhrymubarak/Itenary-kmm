@@ -13,6 +13,7 @@ import com.fakhry.itenary.features.dashboard.navigation.NavigationBarNavGraph
 fun DashboardScreen(
     navHostController: NavHostController,
     onNavigateToDetails: (ItineraryRequestUiModel) -> Unit = {},
+    onNavigateToHistoryDetails: (String) -> Unit = {},
 ) {
     Scaffold(
         bottomBar = {
@@ -23,7 +24,8 @@ fun DashboardScreen(
         NavigationBarNavGraph(
             navHostController = navHostController,
             innerPadding = innerPadding,
-            onNavigateToDetails = onNavigateToDetails
+            onNavigateToDetails = onNavigateToDetails,
+            onNavigateToHistoryDetails = onNavigateToHistoryDetails
         )
     }
 }

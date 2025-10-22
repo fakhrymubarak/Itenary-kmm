@@ -6,6 +6,8 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.fakhry.itenary.features.dashboard.history.navigation.historyDetailsNavController
+import com.fakhry.itenary.features.dashboard.history.navigation.historyDetailsNavGraph
 import com.fakhry.itenary.features.dashboard.navigation.DashboardRoute
 import com.fakhry.itenary.features.dashboard.navigation.dashboardNavGraph
 import com.fakhry.itenary.features.itinerary.results.navigation.itineraryResultsNavController
@@ -44,7 +46,11 @@ fun AppNavHost(
         popEnterTransition = { popEnterTransition },
         popExitTransition = { popExitTransition },
     ) {
-        dashboardNavGraph(onNavigateToDetails = navController::itineraryResultsNavController)
+        dashboardNavGraph(
+            onNavigateToDetails = navController::itineraryResultsNavController,
+            onNavigateToHistoryDetails = navController::historyDetailsNavController
+        )
         itineraryResultsNavGraph(navController::popBackStack)
+        historyDetailsNavGraph(navController::popBackStack)
     }
 }

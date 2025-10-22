@@ -4,10 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fakhry.itenary.commons.model.DayRequestUiModel
 import com.fakhry.itenary.commons.model.ItineraryRequestUiModel
+import com.fakhry.itenary.commons.model.UiState
 import com.itenary.shared.domain.model.BannerDomain
 import com.itenary.shared.domain.repository.BannerRepository
-import com.itenary.shared.util.DomainResult
 import com.itenary.shared.util.DispatcherProvider
+import com.itenary.shared.util.DomainResult
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.viewmodel.container
@@ -16,13 +17,6 @@ import java.time.format.DateTimeFormatter
 
 enum class ValidationPlaceResult {
     INIT, VALID, INVALID_CANNOT_EMPTY, INVALID_LENGTH_TOO_SHORT, INVALID_LENGTH_TOO_LONG,
-}
-
-sealed class UiState<out T>() {
-    object Loading : UiState<Nothing>()
-    object NetworkError : UiState<Nothing>()
-    data class Success<T>(val data: T) : UiState<T>()
-    data class Error(val message: String? = null) : UiState<Nothing>()
 }
 
 data class DashboardState(

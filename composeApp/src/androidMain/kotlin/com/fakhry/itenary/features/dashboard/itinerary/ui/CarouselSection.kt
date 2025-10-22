@@ -26,10 +26,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.fakhry.itenary.commons.model.UiState
 import com.fakhry.itenary.commons.ui.DotsIndicator
 import com.fakhry.itenary.commons.ui.ShimmerBox
 import com.fakhry.itenary.commons.ui.ShimmerCircle
-import com.fakhry.itenary.features.dashboard.ui.UiState
 import com.fakhry.itenary.theme.Spacing
 import com.itenary.shared.domain.model.BannerDomain
 import com.valentinilk.shimmer.shimmer
