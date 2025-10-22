@@ -59,26 +59,19 @@ fun ResultStreamItineraryScreen(
 
     val listState = rememberLazyListState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Itinerary Results") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                colors =
-                    TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { paddingValues ->
+    Scaffold(topBar = {
+        TopAppBar(
+            title = { Text("Itinerary Results") }, navigationIcon = {
+            IconButton(onClick = onNavigateBack) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back"
+                )
+            }
+        }, colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+        )
+    }, snackbarHost = { SnackbarHost(snackbarHostState) }) { paddingValues ->
         LaunchedEffect(state.saveSuccess) {
             if (state.saveSuccess) {
                 snackbarHostState.showSnackbar("Itinerary saved locally")
@@ -108,8 +101,7 @@ fun ResultStreamItineraryScreen(
                         CircularProgressIndicator()
                         Spacer(modifier = Modifier.height(Spacing.md))
                         Text(
-                            text = "Generating your itinerary...",
-                            style = MaterialTheme.typography.bodyLarge
+                            text = "Generating your itinerary...", style = MaterialTheme.typography.bodyLarge
                         )
                     }
                 }
@@ -117,9 +109,14 @@ fun ResultStreamItineraryScreen(
                 state.streamingItinerary.days.isNotEmpty() -> {
                     // Streaming results
                     val streamingItinerary = state.streamingItinerary
-                    LaunchedEffect(streamingItinerary.days.size) {
-                        if (streamingItinerary.days.isNotEmpty()) {
-                            listState.animateScrollToItem(streamingItinerary.days.lastIndex)
+                    val totalTimelineItems = streamingItinerary.days.sumOf { it.items.size }
+                    val totalLazyItems = streamingItinerary.days.size
+                    val lastItem = if (totalLazyItems - 2 < 0) 0 else totalLazyItems - 2
+                    LaunchedEffect(totalLazyItems, totalTimelineItems) {
+                        if (totalLazyItems > 0) {
+                            listState.animateScrollToItem(
+                                lastItem, scrollOffset = Int.MAX_VALUE
+                            )
                         }
                     }
                     LazyColumn(
@@ -135,13 +132,9 @@ fun ResultStreamItineraryScreen(
                         if (streamingItinerary.isComplete) {
                             item {
                                 Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors =
-                                        CardDefaults.cardColors(
-                                            containerColor =
-                                                MaterialTheme.colorScheme
-                                                    .secondaryContainer
-                                        )
+                                    modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                                    )
                                 ) {
                                     Column(modifier = Modifier.padding(Spacing.md)) {
                                         Text(
@@ -151,8 +144,7 @@ fun ResultStreamItineraryScreen(
                                         )
                                         Spacer(modifier = Modifier.height(Spacing.sm))
                                         Text(
-                                            text =
-                                                "Your personalized itinerary is ready. You can now plan your trip!",
+                                            text = "Your personalized itinerary is ready. You can now plan your trip!",
                                             style = MaterialTheme.typography.bodyMedium
                                         )
                                     }
@@ -186,8 +178,7 @@ fun ResultStreamItineraryScreen(
                         )
                         Spacer(modifier = Modifier.height(Spacing.md))
                         Text(
-                            text = state.error ?: "Something went wrong",
-                            style = MaterialTheme.typography.bodyLarge
+                            text = state.error ?: "Something went wrong", style = MaterialTheme.typography.bodyLarge
                         )
                         Spacer(modifier = Modifier.height(Spacing.lg))
                         Button(onClick = onNavigateBack) { Text("Go Back") }
@@ -212,9 +203,7 @@ private fun DayCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = day.dayLabel,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
+                    text = day.dayLabel, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold
                 )
                 if (day.isComplete) {
                     Text(
