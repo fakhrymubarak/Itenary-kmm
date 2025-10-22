@@ -1,6 +1,4 @@
 package com.itenary.shared.data.remote
-
-import com.diamondedge.logging.logging
 import com.itenary.shared.data.database.ItineraryDao
 import com.itenary.shared.data.database.ItineraryEntity
 import com.itenary.shared.data.mappers.SSEEventMapper
@@ -52,18 +50,11 @@ class ItineraryStreamRepositoryImpl(
 
     override suspend fun cacheItinerary(key: String, itinerary: ItineraryDomain): DomainResult<Boolean> =
         try {
-            val id = itineraryDao.insert(ItineraryEntity(id= key, itinerary = itinerary))
-            if (id > 0) {
-                DomainResult.Success(true)
-            } else {
-                logging().e { "Failed to cache itinerary" }
-                DomainResult.Error(message = "Failed to cache itinerary", code = -1)
-            }
+            val id = itineraryDao.insert(ItineraryEntity(id = key, itinerary = itinerary))
+            if (id > 0) DomainResult.Success(true) else DomainResult.Error("Failed to cache itinerary")
         } catch (e: CancellationException) {
-            logging().e(err = e) { "Error caching itinerary: ${e.message}" }
             throw e
         } catch (e: Exception) {
-            logging().e(err = e) { "Error caching itinerary: ${e.message}" }
-            DomainResult.Error(message = "DB error: ${e.message}", code = -1)
+            DomainResult.Error(message = "DB error: ${e.message}")
         }
 }

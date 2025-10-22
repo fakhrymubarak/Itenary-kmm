@@ -38,7 +38,7 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
-            api(libs.kmlogging)
+            // logging in common removed to avoid Kotlin/Native ABI mismatch
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -47,8 +47,6 @@ kotlin {
         }
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
-            implementation(libs.inspektor)
-            implementation(libs.androidx.room.sqlite.wrapper)
             implementation(libs.koin.android)
         }
         iosMain.dependencies {

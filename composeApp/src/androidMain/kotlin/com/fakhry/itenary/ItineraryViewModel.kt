@@ -157,8 +157,9 @@ class ItineraryViewModel(
             }.toMutableList()
         )
 
+        val key = place.mapToKey()
         viewModelScope.launch(dispatcher.io) {
-            when (val result = itineraryRepository.cacheItinerary(place.mapToKey(), domain)) {
+            when (val result = itineraryRepository.cacheItinerary(key, domain)) {
                 is DomainResult.Success -> emit { it.copy(saveSuccess = true, saveError = null) }
                 is DomainResult.Error -> emit { it.copy(saveError = result.message ?: "Save failed") }
                 is DomainResult.NetworkError -> emit { it.copy(saveError = "Network error while saving") }

@@ -21,7 +21,6 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.koin.android)
             implementation(libs.koin.androidx.compose)
-            implementation(libs.kmlogging)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.coil.compose)
             implementation(libs.orbit.viewmodel)
@@ -49,7 +48,6 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(libs.inspektor)
 
         }
         commonTest.dependencies {

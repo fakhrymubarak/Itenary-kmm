@@ -12,7 +12,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import com.gyanoba.inspektor.openInspektor
 import kotlin.math.sqrt
 
 class MainActivity : ComponentActivity() {
@@ -41,7 +40,7 @@ class MainActivity : ComponentActivity() {
                     val currentTime = System.currentTimeMillis()
                     if (currentTime - lastShakeTime > shakeTimeThreshold) {
                         lastShakeTime = currentTime
-                        openInspektor()
+                        // Inspektor disabled in current build; no-op on shake
                     }
                 }
             }

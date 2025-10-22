@@ -8,6 +8,7 @@ import com.itenary.shared.domain.model.TimelineItemDomain
 import com.itenary.shared.domain.model.TravelFromPrevDomain
 import com.itenary.shared.domain.model.TravelMode
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class ItineraryConverters {
@@ -169,4 +170,3 @@ private fun TravelModeDto.toDomain(): TravelMode = when (this) {
     TravelModeDto.OTHERS -> TravelMode.OTHERS
     TravelModeDto.DEFAULT -> TravelMode.DEFAULT
 }
-
