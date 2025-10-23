@@ -1,4 +1,4 @@
-package com.fakhry.itenary.features.dashboard.history.ui
+package com.fakhry.itenary.features.dashboard.history.ui.details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -61,7 +61,12 @@ class HistoryDetailsViewModel(
             )
         }
 
-        return HistoryDetailsUiState(isLoading = false, title = formatTitleFromKey(key), days = daysUi, error = null)
+        return HistoryDetailsUiState(
+            isLoading = false,
+            title = formatTitleFromKey(key),
+            days = daysUi,
+            error = null
+        )
     }
 
     private fun formatTitleFromKey(key: String): String {

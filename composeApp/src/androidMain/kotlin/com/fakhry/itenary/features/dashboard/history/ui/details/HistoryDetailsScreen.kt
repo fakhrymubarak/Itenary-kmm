@@ -1,4 +1,4 @@
-package com.fakhry.itenary.features.dashboard.history.ui
+package com.fakhry.itenary.features.dashboard.history.ui.details
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

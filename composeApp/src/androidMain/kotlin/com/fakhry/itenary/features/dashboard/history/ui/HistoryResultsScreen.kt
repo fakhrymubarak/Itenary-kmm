@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -26,8 +25,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.fakhry.itenary.features.dashboard.history.ui.components.HistoryEmptyState
+import com.fakhry.itenary.features.dashboard.history.ui.components.HistoryErrorState
 import com.fakhry.itenary.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 
@@ -69,6 +69,7 @@ fun HistoryResultsScreen(
                     message = errorMessage,
                     onRetry = viewModel::loadCachedItineraries
                 )
+
                 state.itineraries.isEmpty() -> HistoryEmptyState()
                 else -> HistoryItineraryList(
                     itineraries = state.itineraries,
@@ -89,54 +90,6 @@ private fun HistoryLoadingState() {
         Text(
             text = "Loading saved itineraries...",
             style = MaterialTheme.typography.bodyLarge
-        )
-    }
-}
-
-@Composable
-private fun HistoryErrorState(
-    message: String,
-    onRetry: () -> Unit,
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(Spacing.md)
-    ) {
-        Text(
-            text = "❌",
-            style = MaterialTheme.typography.displayMedium
-        )
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center
-        )
-        Button(onClick = onRetry) {
-            Text("Retry")
-        }
-    }
-}
-
-@Composable
-private fun HistoryEmptyState() {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(Spacing.md)
-    ) {
-        Text(
-            text = "🔖",
-            style = MaterialTheme.typography.displayLarge
-        )
-        Text(
-            text = "No saved itineraries yet",
-            style = MaterialTheme.typography.headlineMedium,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = "Generate an itinerary and save it to revisit it here.",
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }

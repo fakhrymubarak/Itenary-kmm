@@ -5,8 +5,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.rememberNavController
-import com.fakhry.itenary.features.dashboard.history.ui.HistoryDetailsViewModel
 import com.fakhry.itenary.features.dashboard.history.ui.HistoryResultsViewModel
+import com.fakhry.itenary.features.dashboard.history.ui.details.HistoryDetailsViewModel
 import com.fakhry.itenary.features.dashboard.navigation.DashboardRoute
 import com.fakhry.itenary.features.dashboard.ui.DashboardViewModel
 import com.fakhry.itenary.features.itinerary.results.ui.ItineraryViewModel
@@ -16,7 +16,6 @@ import com.itenary.shared.di.AndroidDatabaseModule
 import com.itenary.shared.di.SharedKoinModule
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import org.koin.core.module.dsl.viewModelOf
@@ -37,13 +36,7 @@ class ItineraryApp : Application() {
                     viewModelOf(::ItineraryViewModel)
                     viewModelOf(::DashboardViewModel)
                     viewModelOf(::HistoryResultsViewModel)
-                    viewModel { (key: String) ->
-                        HistoryDetailsViewModel(
-                            repository = get(),
-                            dispatcherProvider = get(),
-                            key = key
-                        )
-                    }
+                    viewModelOf(::HistoryDetailsViewModel)
                 }
             )
         }
