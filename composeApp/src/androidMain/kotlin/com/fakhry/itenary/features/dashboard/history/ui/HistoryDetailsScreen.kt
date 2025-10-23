@@ -45,7 +45,7 @@ fun HistoryDetailsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(state.title.ifBlank { "Saved Itinerary" }) },
+                title = { Text(state.title) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -56,12 +56,12 @@ fun HistoryDetailsScreen(
                 }
             )
         }
-    ) { paddingValues ->
+    ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = Spacing.md, vertical = Spacing.sm),
+                .padding(innerPadding)
+                .padding(horizontal = Spacing.md),
             contentAlignment = Alignment.Center
         ) {
             when {
@@ -112,11 +112,6 @@ fun HistoryDetailsScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalAlignment = Alignment.Start
                             ) {
-                                Text(
-                                    text = state.title.ifBlank { "Saved Itinerary" },
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    fontWeight = FontWeight.Bold
-                                )
                                 Spacer(modifier = Modifier.height(Spacing.xs))
                                 Text(
                                     text = "${state.days.size} day(s)",
@@ -130,6 +125,10 @@ fun HistoryDetailsScreen(
                             key = { it.dayIndex }
                         ) { day ->
                             DayCard(day = day)
+                        }
+
+                        item {
+                            Spacer(modifier = Modifier.height(Spacing.sm))
                         }
                     }
                 }
