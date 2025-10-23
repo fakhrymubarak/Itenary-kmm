@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.fakhry.itenary.features.dashboard.history.ui.HistoryResultsViewModel
 import com.fakhry.itenary.features.dashboard.navigation.DashboardRoute
 import com.fakhry.itenary.features.dashboard.ui.DashboardViewModel
+import com.fakhry.itenary.features.itinerary.results.ui.ItineraryViewModel
 import com.fakhry.itenary.navigation.AppNavHost
 import com.fakhry.itenary.theme.ItenaryTheme
 import com.itenary.shared.di.AndroidDatabaseModule

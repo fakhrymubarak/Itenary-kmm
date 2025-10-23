@@ -1,4 +1,4 @@
-package com.fakhry.itenary.features.dashboard.itinerary.ui
+package com.fakhry.itenary.features.dashboard.itinerary.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
@@ -53,6 +53,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.fakhry.itenary.commons.model.DayRequestUiModel
+import com.fakhry.itenary.features.dashboard.itinerary.ui.state.TransitionDayState
 import com.fakhry.itenary.theme.ItenaryTheme
 import com.fakhry.itenary.theme.Spacing
 import java.time.LocalTime

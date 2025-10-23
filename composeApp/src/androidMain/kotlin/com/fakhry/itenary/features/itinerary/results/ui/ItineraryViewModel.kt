@@ -1,11 +1,13 @@
-package com.fakhry.itenary
+package com.fakhry.itenary.features.itinerary.results.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fakhry.itenary.commons.model.ItineraryRequestUiModel
 import com.fakhry.itenary.commons.model.toListDayRequest
+import com.fakhry.itenary.features.itinerary.results.model.StreamingDayUiModel
 import com.fakhry.itenary.features.itinerary.results.model.TimelineItemUiModel
 import com.fakhry.itenary.features.itinerary.results.model.toUiModel
+import com.fakhry.itenary.features.itinerary.results.state.ResultItineraryUiState
 import com.itenary.shared.domain.model.DayDomain
 import com.itenary.shared.domain.model.ItineraryDomain
 import com.itenary.shared.domain.model.ItineraryRequest
@@ -23,28 +25,6 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-
-data class StreamingDayUiModel(
-    val dayIndex: Int,
-    val dayLabel: String,
-    val items: MutableList<TimelineItemUiModel> = mutableListOf(),
-    val isComplete: Boolean = false,
-)
-
-data class StreamingItineraryUiModel(
-    val days: MutableList<StreamingDayUiModel> = mutableListOf(),
-    val isComplete: Boolean = false,
-)
-
-data class ResultItineraryUiState(
-    val isLoading: Boolean = false,
-    val streamingItinerary: StreamingItineraryUiModel = StreamingItineraryUiModel(),
-    val isComplete: Boolean = false,
-    val error: String? = null,
-    val saveSuccess: Boolean = false,
-    val saveConflict: Boolean = false,
-    val saveError: String? = null,
-)
 
 class ItineraryViewModel(
     private val streamItineraryUseCase: StreamItineraryUseCase,

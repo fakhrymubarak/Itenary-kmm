@@ -20,19 +20,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.fakhry.itenary.commons.model.DayRequestUiModel
 import com.fakhry.itenary.commons.model.ItineraryRequestUiModel
+import com.fakhry.itenary.features.dashboard.itinerary.ui.components.CarouselSection
+import com.fakhry.itenary.features.dashboard.itinerary.ui.components.LocationInputSection
+import com.fakhry.itenary.features.dashboard.itinerary.ui.components.daysSection
+import com.fakhry.itenary.features.dashboard.itinerary.ui.state.TransitionDayState
 import com.fakhry.itenary.features.dashboard.ui.DashboardSideEffect
 import com.fakhry.itenary.features.dashboard.ui.DashboardViewModel
 import com.fakhry.itenary.features.dashboard.ui.ValidationPlaceResult
 import com.fakhry.itenary.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 import org.orbitmvi.orbit.compose.collectAsState
-
-data class TransitionDayState(
-    val day: DayRequestUiModel,
-    val transitionState: MutableTransitionState<Boolean>,
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

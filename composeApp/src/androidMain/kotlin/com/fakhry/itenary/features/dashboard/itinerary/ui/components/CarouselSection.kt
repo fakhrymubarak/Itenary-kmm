@@ -1,4 +1,4 @@
-package com.fakhry.itenary.features.dashboard.itinerary.ui
+package com.fakhry.itenary.features.dashboard.itinerary.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
