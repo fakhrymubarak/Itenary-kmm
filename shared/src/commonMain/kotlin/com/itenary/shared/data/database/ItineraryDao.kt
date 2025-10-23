@@ -12,6 +12,9 @@ interface ItineraryDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(entity: ItineraryEntity): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(entity: ItineraryEntity): Long
+
     @Query("SELECT * FROM itinerary ORDER BY id DESC")
     suspend fun getAll(): List<ItineraryEntity>
 
@@ -20,4 +23,7 @@ interface ItineraryDao {
 
     @Delete
     suspend fun delete(entity: ItineraryEntity)
+
+    @Query("SELECT id FROM itinerary")
+    suspend fun getAllIds(): List<String>
 }

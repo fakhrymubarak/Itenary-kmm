@@ -125,43 +125,29 @@ class ItineraryViewModel(
         }
     }
 
-
-    /**
-     * Save generated itinerary to LocalStorage.
-     *
-     * if
-     * */
     fun saveToLocalStorage() {
-        val snapshot = latestState.streamingItinerary
-        if (snapshot.days.isEmpty()) return
+        val domain = currentItineraryDomain() ?: return
 
         viewModelScope.launch(dispatcher.io) {
 
-            val domain = ItineraryDomain(
-                days = snapshot.days.map { day ->
-                    DayDomain(
-                        dayIndex = day.dayIndex,
-                        dayLabel = day.dayLabel,
-                        items = day.items.map { it.toDomain() }.toMutableList()
-                    )
-                }.toMutableList()
-            )
-
             val key = place.mapToKey()
             when (val result = itineraryRepository.cacheItinerary(key, domain)) {
-                is DomainResult.Success -> emit { it.copy(saveSuccess = true, saveError = null) }
+                is DomainResult.Success -> emit {
+                    it.copy(saveSuccess = true, saveError = null, saveConflict = false)
+                }
+
                 is DomainResult.Error -> emit {
+                    // handle insert DB failed due to already existing key
                     if (result.code == ERR_DB_INSERT_CONFLICT) {
-                        it.copy(
-                            saveConflict = true,
-                            saveError = result.message ?: "Save failed"
-                        )
+                        it.copy(saveConflict = true, saveError = null)
                     } else {
-                        it.copy(saveError = result.message ?: "Save failed")
+                        it.copy(saveError = result.message ?: "Saving itinerary failed", saveConflict = false)
                     }
                 }
 
-                is DomainResult.NetworkError -> emit { it.copy(saveError = "Network error while saving") }
+                is DomainResult.NetworkError -> emit {
+                    it.copy(saveError = "Network error while saving", saveConflict = false)
+                }
             }
         }
     }
@@ -174,6 +160,50 @@ class ItineraryViewModel(
 
     fun consumeSaveError() {
         emit { it.copy(saveError = null) }
+    }
+
+    fun consumeSaveConflict() {
+        emit { it.copy(saveConflict = false, saveError = null) }
+    }
+
+    fun overwriteExistingItinerary() {
+        val domain = currentItineraryDomain() ?: return
+        viewModelScope.launch(dispatcher.io) {
+            val key = place.mapToKey()
+            when (val result = itineraryRepository.overwriteItinerary(key, domain)) {
+                is DomainResult.Success -> emit {
+                    it.copy(saveSuccess = true, saveConflict = false, saveError = null)
+                }
+
+                is DomainResult.Error -> emit {
+                    it.copy(saveError = result.message ?: "Save failed", saveConflict = false)
+                }
+
+                is DomainResult.NetworkError -> emit {
+                    it.copy(saveError = "Network error while saving", saveConflict = false)
+                }
+            }
+        }
+    }
+
+    fun keepBothItinerary() {
+        val domain = currentItineraryDomain() ?: return
+        viewModelScope.launch(dispatcher.io) {
+            val key = place.mapToKey()
+            when (val result = itineraryRepository.cacheItineraryCopy(key, domain)) {
+                is DomainResult.Success -> emit {
+                    it.copy(saveSuccess = true, saveConflict = false, saveError = null)
+                }
+
+                is DomainResult.Error -> emit {
+                    it.copy(saveError = result.message ?: "Save failed", saveConflict = false)
+                }
+
+                is DomainResult.NetworkError -> emit {
+                    it.copy(saveError = "Network error while saving", saveConflict = false)
+                }
+            }
+        }
     }
 
     private fun TimelineItemUiModel.toDomain(): TimelineItemDomain = TimelineItemDomain(
@@ -201,5 +231,20 @@ class ItineraryViewModel(
     override fun onCleared() {
         streamJob?.cancel()
         super.onCleared()
+    }
+
+    private fun currentItineraryDomain(): ItineraryDomain? {
+        val snapshot = latestState.streamingItinerary
+        if (snapshot.days.isEmpty()) return null
+
+        return ItineraryDomain(
+            days = snapshot.days.map { day ->
+                DayDomain(
+                    dayIndex = day.dayIndex,
+                    dayLabel = day.dayLabel,
+                    items = day.items.map { it.toDomain() }.toMutableList()
+                )
+            }.toMutableList()
+        )
     }
 }

@@ -9,5 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface ItineraryStreamRepository {
     suspend fun streamItineraryGeneration(request: ItineraryRequest): Flow<StreamingEvent>
     suspend fun cacheItinerary(key: String, itinerary: ItineraryDomain): DomainResult<Boolean>
+    suspend fun cacheItineraryCopy(baseKey: String, itinerary: ItineraryDomain): DomainResult<Boolean>
+    suspend fun overwriteItinerary(key: String, itinerary: ItineraryDomain): DomainResult<Boolean>
     suspend fun getSavedItinerary() : DomainResult<List<ItineraryDomain>>
 }

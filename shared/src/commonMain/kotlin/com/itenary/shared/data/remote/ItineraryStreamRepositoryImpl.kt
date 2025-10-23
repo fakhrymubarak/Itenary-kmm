@@ -1,4 +1,5 @@
 package com.itenary.shared.data.remote
+
 import com.itenary.shared.data.database.ItineraryDao
 import com.itenary.shared.data.database.ItineraryEntity
 import com.itenary.shared.data.mappers.SSEEventMapper
@@ -65,6 +66,39 @@ class ItineraryStreamRepositoryImpl(
             DomainResult.Error(message = "DB error: ${e.message}")
         }
 
+    override suspend fun cacheItineraryCopy(
+        baseKey: String,
+        itinerary: ItineraryDomain,
+    ): DomainResult<Boolean> =
+        try {
+            val existingIds = itineraryDao.getAllIds().toSet()
+            val copyKey = generateCopyKey(baseKey, existingIds)
+            val id = itineraryDao.insert(ItineraryEntity(id = copyKey, itinerary = itinerary))
+            if (id != -1L) {
+                DomainResult.Success(true)
+            } else {
+                DomainResult.Error("Failed to cache itinerary copy")
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            DomainResult.Error(message = "DB error: ${e.message}")
+        }
+
+    override suspend fun overwriteItinerary(
+        key: String,
+        itinerary: ItineraryDomain,
+    ): DomainResult<Boolean> =
+        try {
+            itineraryDao.upsert(ItineraryEntity(id = key, itinerary = itinerary))
+            DomainResult.Success(true)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            DomainResult.Error(message = "DB error: ${e.message}")
+        }
+
+
     override suspend fun getSavedItinerary(): DomainResult<List<ItineraryDomain>> =
         try {
             val cached = itineraryDao.getAll().map { it.itinerary }
@@ -78,4 +112,15 @@ class ItineraryStreamRepositoryImpl(
         } catch (e: Exception) {
             DomainResult.Error(message = "DB error: ${e.message}")
         }
+
+    private fun generateCopyKey(baseKey: String, existingIds: Set<String>): String {
+        val base = "${baseKey}_copy"
+        if (base !in existingIds) return base
+        var index = 2
+        while (true) {
+            val candidate = "${base}_$index"
+            if (candidate !in existingIds) return candidate
+            index++
+        }
+    }
 }
