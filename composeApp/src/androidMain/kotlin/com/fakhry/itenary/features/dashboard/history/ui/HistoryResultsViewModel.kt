@@ -2,6 +2,7 @@ package com.fakhry.itenary.features.dashboard.history.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fakhry.itenary.features.dashboard.history.utils.formatKeyToTitle
 import com.itenary.shared.domain.model.SavedItineraryDomain
 import com.itenary.shared.domain.repository.ItineraryStreamRepository
 import com.itenary.shared.util.DispatcherProvider
@@ -41,15 +42,9 @@ class HistoryResultsViewModel(
             _state.update { it.copy(isLoading = true, error = null) }
             when (val result = repository.getSavedItinerary()) {
                 is DomainResult.Success -> {
-                    val itineraries = result.data.mapIndexed { index, saved ->
-                        saved.toUiModel(index)
-                    }
+                    val itineraries = result.data.mapIndexed { index, saved -> saved.toUiModel() }
                     _state.update {
-                        it.copy(
-                            isLoading = false,
-                            itineraries = itineraries,
-                            error = null,
-                        )
+                        it.copy(isLoading = false, itineraries = itineraries, error = null)
                     }
                 }
 
@@ -76,12 +71,9 @@ class HistoryResultsViewModel(
         }
     }
 
-    private fun SavedItineraryDomain.toUiModel(index: Int): HistoryItineraryUiModel {
-        val title = "Itinerary #${index + 1}"
+    private fun SavedItineraryDomain.toUiModel(): HistoryItineraryUiModel {
         return HistoryItineraryUiModel(
-            key = key,
-            title = title,
-            totalDays = itinerary.days.size
+            key = key, title = key.formatKeyToTitle(), totalDays = itinerary.days.size
         )
     }
 }

@@ -112,7 +112,6 @@ private fun HistoryItineraryList(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HistoryItineraryCard(
     itinerary: HistoryItineraryUiModel,
