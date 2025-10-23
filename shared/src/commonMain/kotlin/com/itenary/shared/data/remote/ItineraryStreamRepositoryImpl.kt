@@ -8,6 +8,7 @@ import com.itenary.shared.domain.model.ItineraryRequest
 import com.itenary.shared.domain.model.StreamingEvent
 import com.itenary.shared.domain.repository.ItineraryStreamRepository
 import com.itenary.shared.util.DomainResult
+import com.itenary.shared.util.ERR_DB_INSERT_CONFLICT
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.sse.sse
 import io.ktor.client.request.setBody
@@ -51,7 +52,13 @@ class ItineraryStreamRepositoryImpl(
     override suspend fun cacheItinerary(key: String, itinerary: ItineraryDomain): DomainResult<Boolean> =
         try {
             val id = itineraryDao.insert(ItineraryEntity(id = key, itinerary = itinerary))
-            if (id > 0) DomainResult.Success(true) else DomainResult.Error("Failed to cache itinerary")
+            if (id > 0) {
+                DomainResult.Success(true)
+            } else if (id == -1L) {
+                DomainResult.Error("Itinerary already exists", ERR_DB_INSERT_CONFLICT)
+            } else {
+                DomainResult.Error("Failed to cache itinerary")
+            }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

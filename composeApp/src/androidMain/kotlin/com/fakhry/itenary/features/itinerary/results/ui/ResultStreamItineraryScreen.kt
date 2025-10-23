@@ -78,6 +78,12 @@ fun ResultStreamItineraryScreen(
                 viewModel.consumeSaveResult()
             }
         }
+        LaunchedEffect(state.saveConflict) {
+            // TODO SHOW DIALOG TO PICK BETWEEN
+            // 1. OVERWRITE
+            // 2. CREATE COPY
+            // 3. CANCEL
+        }
         LaunchedEffect(state.saveError) {
             val msg = state.saveError
             if (!msg.isNullOrBlank()) {

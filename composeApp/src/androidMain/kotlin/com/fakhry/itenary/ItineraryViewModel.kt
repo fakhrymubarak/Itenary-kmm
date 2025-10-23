@@ -17,6 +17,7 @@ import com.itenary.shared.domain.repository.ItineraryStreamRepository
 import com.itenary.shared.domain.usecase.StreamItineraryUseCase
 import com.itenary.shared.util.DispatcherProvider
 import com.itenary.shared.util.DomainResult
+import com.itenary.shared.util.ERR_DB_INSERT_CONFLICT
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -41,6 +42,7 @@ data class ResultItineraryUiState(
     val isComplete: Boolean = false,
     val error: String? = null,
     val saveSuccess: Boolean = false,
+    val saveConflict: Boolean = false,
     val saveError: String? = null,
 )
 
@@ -143,25 +145,42 @@ class ItineraryViewModel(
         }
     }
 
+
+    /**
+     * Save generated itinerary to LocalStorage.
+     *
+     * if
+     * */
     fun saveToLocalStorage() {
         val snapshot = latestState.streamingItinerary
         if (snapshot.days.isEmpty()) return
 
-        val domain = ItineraryDomain(
-            days = snapshot.days.map { day ->
-                DayDomain(
-                    dayIndex = day.dayIndex,
-                    dayLabel = day.dayLabel,
-                    items = day.items.map { it.toDomain() }.toMutableList()
-                )
-            }.toMutableList()
-        )
-
-        val key = place.mapToKey()
         viewModelScope.launch(dispatcher.io) {
+
+            val domain = ItineraryDomain(
+                days = snapshot.days.map { day ->
+                    DayDomain(
+                        dayIndex = day.dayIndex,
+                        dayLabel = day.dayLabel,
+                        items = day.items.map { it.toDomain() }.toMutableList()
+                    )
+                }.toMutableList()
+            )
+
+            val key = place.mapToKey()
             when (val result = itineraryRepository.cacheItinerary(key, domain)) {
                 is DomainResult.Success -> emit { it.copy(saveSuccess = true, saveError = null) }
-                is DomainResult.Error -> emit { it.copy(saveError = result.message ?: "Save failed") }
+                is DomainResult.Error -> emit {
+                    if (result.code == ERR_DB_INSERT_CONFLICT) {
+                        it.copy(
+                            saveConflict = true,
+                            saveError = result.message ?: "Save failed"
+                        )
+                    } else {
+                        it.copy(saveError = result.message ?: "Save failed")
+                    }
+                }
+
                 is DomainResult.NetworkError -> emit { it.copy(saveError = "Network error while saving") }
             }
         }

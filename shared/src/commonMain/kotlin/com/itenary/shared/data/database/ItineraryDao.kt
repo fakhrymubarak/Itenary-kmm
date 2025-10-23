@@ -9,7 +9,7 @@ import androidx.room.Query
 @Dao
 interface ItineraryDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(entity: ItineraryEntity): Long
 
     @Query("SELECT * FROM itinerary ORDER BY id DESC")
