@@ -3,6 +3,7 @@ package com.fakhry.itenary.features.dashboard.history.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.fakhry.itenary.features.itinerary.results.model.TimelineItemUiModel
 import com.fakhry.itenary.theme.Spacing
 import org.koin.androidx.compose.koinViewModel
 
@@ -35,6 +35,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HistoryResultsScreen(
     onNavigateBack: () -> Unit,
+    onItinerarySelected: (String) -> Unit,
     viewModel: HistoryResultsViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -69,7 +70,10 @@ fun HistoryResultsScreen(
                     onRetry = viewModel::loadCachedItineraries
                 )
                 state.itineraries.isEmpty() -> HistoryEmptyState()
-                else -> HistoryItineraryList(itineraries = state.itineraries)
+                else -> HistoryItineraryList(
+                    itineraries = state.itineraries,
+                    onItinerarySelected = onItinerarySelected
+                )
             }
         }
     }
@@ -138,94 +142,61 @@ private fun HistoryEmptyState() {
 }
 
 @Composable
-private fun HistoryItineraryList(itineraries: List<HistoryItineraryUiModel>) {
+private fun HistoryItineraryList(
+    itineraries: List<HistoryItineraryUiModel>,
+    onItinerarySelected: (String) -> Unit,
+) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(Spacing.md)
     ) {
         items(itineraries) { itinerary ->
-            HistoryItineraryCard(itinerary)
+            HistoryItineraryCard(
+                itinerary = itinerary,
+                onClick = { onItinerarySelected(itinerary.key) }
+            )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun HistoryItineraryCard(itinerary: HistoryItineraryUiModel) {
+private fun HistoryItineraryCard(
+    itinerary: HistoryItineraryUiModel,
+    onClick: () -> Unit,
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        onClick = onClick
     ) {
         Column(
-            modifier = Modifier.padding(Spacing.md),
-            verticalArrangement = Arrangement.spacedBy(Spacing.md)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(Spacing.md),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm)
         ) {
             Text(
                 text = itinerary.title,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
-
-            itinerary.days.forEach { day ->
-                HistoryDaySection(day)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Total days",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = itinerary.totalDays.toString(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
             }
-        }
-    }
-}
-
-@Composable
-private fun HistoryDaySection(day: HistoryDayUiModel) {
-    Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-        Text(
-            text = day.label,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold
-        )
-
-        if (day.items.isEmpty()) {
-            Text(
-                text = "No activities recorded",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        } else {
-            Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                day.items.forEach { item ->
-                    HistoryTimelineItem(item)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun HistoryTimelineItem(item: TimelineItemUiModel) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(Spacing.xs)
-    ) {
-        val title = item.name.ifBlank { "Unnamed activity" }
-        Text(
-            text = "${item.timeStart} - ${item.timeEnd}",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Medium
-        )
-        if (item.shortDesc.isNotBlank()) {
-            Text(
-                text = item.shortDesc,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-        if (item.expenseEstimation.isNotBlank()) {
-            Text(
-                text = item.expenseEstimation,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary
-            )
         }
     }
 }

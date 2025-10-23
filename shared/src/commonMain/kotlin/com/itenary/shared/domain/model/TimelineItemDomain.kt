@@ -4,6 +4,11 @@ data class ItineraryDomain(
     val days: MutableList<DayDomain> = mutableListOf(),
 )
 
+data class SavedItineraryDomain(
+    val key: String,
+    val itinerary: ItineraryDomain,
+)
+
 data class DayDomain(
     val dayIndex: Int,
     val dayLabel: String,

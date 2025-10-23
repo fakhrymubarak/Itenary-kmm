@@ -206,7 +206,7 @@ fun ResultStreamItineraryScreen(
 }
 
 @Composable
-private fun DayCard(
+fun DayCard(
     day: StreamingDayUiModel,
 ) {
     Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp)) {

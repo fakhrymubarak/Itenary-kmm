@@ -9,9 +9,11 @@ import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.historyResultsNavGraph(
     onNavigateBack: () -> Unit,
+    onNavigateToHistoryDetails: (String) -> Unit,
 ) = composable<HistoryResultsRoute> { backstackEntry ->
     HistoryResultsScreen(
         onNavigateBack = onNavigateBack,
+        onItinerarySelected = onNavigateToHistoryDetails,
     )
 }
 

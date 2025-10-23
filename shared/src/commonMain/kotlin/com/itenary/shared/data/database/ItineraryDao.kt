@@ -19,7 +19,7 @@ interface ItineraryDao {
     suspend fun getAll(): List<ItineraryEntity>
 
     @Query("SELECT * FROM itinerary WHERE id = :id")
-    suspend fun getById(id: Long): ItineraryEntity?
+    suspend fun getByKey(id: String): ItineraryEntity?
 
     @Delete
     suspend fun delete(entity: ItineraryEntity)

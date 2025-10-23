@@ -26,6 +26,9 @@ fun NavigationBarNavGraph(
     ) {
         reqStreamItineraryNavGraph(onNavigateToDetails = onNavigateToDetails)
         foodNavGraph(onNavigateBack = navHostController::popBackStack)
-        historyResultsNavGraph(onNavigateBack = navHostController::popBackStack)
+        historyResultsNavGraph(
+            onNavigateBack = navHostController::popBackStack,
+            onNavigateToHistoryDetails = onNavigateToHistoryDetails
+        )
     }
 }

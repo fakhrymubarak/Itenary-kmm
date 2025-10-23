@@ -2,9 +2,7 @@ package com.fakhry.itenary.features.dashboard.history.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fakhry.itenary.features.itinerary.results.model.TimelineItemUiModel
-import com.fakhry.itenary.features.itinerary.results.model.toUiModel
-import com.itenary.shared.domain.model.ItineraryDomain
+import com.itenary.shared.domain.model.SavedItineraryDomain
 import com.itenary.shared.domain.repository.ItineraryStreamRepository
 import com.itenary.shared.util.DispatcherProvider
 import com.itenary.shared.util.DomainResult
@@ -21,13 +19,9 @@ data class HistoryResultsState(
 )
 
 data class HistoryItineraryUiModel(
+    val key: String,
     val title: String,
-    val days: List<HistoryDayUiModel>,
-)
-
-data class HistoryDayUiModel(
-    val label: String,
-    val items: List<TimelineItemUiModel>,
+    val totalDays: Int,
 )
 
 class HistoryResultsViewModel(
@@ -47,8 +41,8 @@ class HistoryResultsViewModel(
             _state.update { it.copy(isLoading = true, error = null) }
             when (val result = repository.getSavedItinerary()) {
                 is DomainResult.Success -> {
-                    val itineraries = result.data.mapIndexed { index, itinerary ->
-                        itinerary.toUiModel(index)
+                    val itineraries = result.data.mapIndexed { index, saved ->
+                        saved.toUiModel(index)
                     }
                     _state.update {
                         it.copy(
@@ -82,14 +76,12 @@ class HistoryResultsViewModel(
         }
     }
 
-    private fun ItineraryDomain.toUiModel(index: Int): HistoryItineraryUiModel {
-        val daysUiModel = days.map { day ->
-            HistoryDayUiModel(
-                label = day.dayLabel,
-                items = day.items.map { it.toUiModel() }
-            )
-        }
+    private fun SavedItineraryDomain.toUiModel(index: Int): HistoryItineraryUiModel {
         val title = "Itinerary #${index + 1}"
-        return HistoryItineraryUiModel(title = title, days = daysUiModel)
+        return HistoryItineraryUiModel(
+            key = key,
+            title = title,
+            totalDays = itinerary.days.size
+        )
     }
 }

@@ -6,6 +6,7 @@ import com.itenary.shared.data.mappers.SSEEventMapper
 import com.itenary.shared.data.mappers.toDto
 import com.itenary.shared.domain.model.ItineraryDomain
 import com.itenary.shared.domain.model.ItineraryRequest
+import com.itenary.shared.domain.model.SavedItineraryDomain
 import com.itenary.shared.domain.model.StreamingEvent
 import com.itenary.shared.domain.repository.ItineraryStreamRepository
 import com.itenary.shared.util.DomainResult
@@ -99,13 +100,37 @@ class ItineraryStreamRepositoryImpl(
         }
 
 
-    override suspend fun getSavedItinerary(): DomainResult<List<ItineraryDomain>> =
+    override suspend fun getSavedItinerary(): DomainResult<List<SavedItineraryDomain>> =
         try {
-            val cached = itineraryDao.getAll().map { it.itinerary }
+            val cached = itineraryDao.getAll().map { entity ->
+                SavedItineraryDomain(
+                    key = entity.id,
+                    itinerary = entity.itinerary
+                )
+            }
             if (cached.isNotEmpty()) {
                 DomainResult.Success(cached)
             } else {
                 DomainResult.Error("No saved itinerary found")
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            DomainResult.Error(message = "DB error: ${e.message}")
+        }
+
+    override suspend fun getSavedItineraryByKey(key: String): DomainResult<SavedItineraryDomain> =
+        try {
+            val entity = itineraryDao.getByKey(key)
+            if (entity != null) {
+                DomainResult.Success(
+                    SavedItineraryDomain(
+                        key = entity.id,
+                        itinerary = entity.itinerary
+                    )
+                )
+            } else {
+                DomainResult.Error("Itinerary not found")
             }
         } catch (e: CancellationException) {
             throw e
