@@ -14,7 +14,6 @@ import com.fakhry.itenary.navigation.AppNavHost
 import com.fakhry.itenary.theme.ItenaryTheme
 import com.itenary.shared.di.AndroidDatabaseModule
 import com.itenary.shared.di.SharedKoinModule
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
@@ -44,7 +43,6 @@ class ItineraryApp : Application() {
 }
 
 @Composable
-@Preview
 fun App() {
     ItenaryTheme {
         Surface(color = MaterialTheme.colorScheme.background) {

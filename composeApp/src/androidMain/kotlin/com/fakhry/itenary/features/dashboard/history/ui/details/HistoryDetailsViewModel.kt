@@ -33,20 +33,13 @@ class HistoryDetailsViewModel(
         viewModelScope.launch(dispatcherProvider.io) {
             _state.update { it.copy(isLoading = true, error = null) }
             when (val result = repository.getSavedItineraryByKey(key)) {
-                is DomainResult.Success -> {
-                    _state.update { result.data.toUiState() }
+                is DomainResult.Success -> _state.update { result.data.toUiState() }
+                is DomainResult.Error -> _state.update {
+                    it.copy(isLoading = false, error = result.message ?: "Unable to load itinerary details")
                 }
 
-                is DomainResult.Error -> {
-                    _state.update {
-                        it.copy(isLoading = false, error = result.message ?: "Unable to load itinerary details")
-                    }
-                }
-
-                is DomainResult.NetworkError -> {
-                    _state.update {
-                        it.copy(isLoading = false, error = "Network error while loading itinerary details")
-                    }
+                is DomainResult.NetworkError -> _state.update {
+                    it.copy(isLoading = false, error = "Network error while loading itinerary details")
                 }
             }
         }

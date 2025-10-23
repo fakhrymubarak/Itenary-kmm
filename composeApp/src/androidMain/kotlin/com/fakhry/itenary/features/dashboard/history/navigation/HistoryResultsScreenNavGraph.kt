@@ -1,6 +1,5 @@
 package com.fakhry.itenary.features.dashboard.history.navigation
 
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.fakhry.itenary.features.dashboard.history.ui.HistoryResultsScreen
@@ -16,8 +15,6 @@ fun NavGraphBuilder.historyResultsNavGraph(
         onItinerarySelected = onNavigateToHistoryDetails,
     )
 }
-
-fun NavController.historyResultsNavController() = navigate(route = HistoryResultsRoute)
 
 @Serializable
 data object HistoryResultsRoute : Route

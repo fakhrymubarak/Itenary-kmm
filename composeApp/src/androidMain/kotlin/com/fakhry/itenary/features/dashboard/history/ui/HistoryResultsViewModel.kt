@@ -20,9 +20,9 @@ data class HistoryResultsState(
 )
 
 data class HistoryItineraryUiModel(
-    val key: String,
-    val title: String,
-    val totalDays: Int,
+    val key: String = "",
+    val title: String = "",
+    val totalDays: String = "",
 )
 
 class HistoryResultsViewModel(
@@ -73,7 +73,7 @@ class HistoryResultsViewModel(
 
     private fun SavedItineraryDomain.toUiModel(): HistoryItineraryUiModel {
         return HistoryItineraryUiModel(
-            key = key, title = key.formatKeyToTitle(), totalDays = itinerary.days.size
+            key = key, title = key.formatKeyToTitle(), totalDays = "${itinerary.days.size} Days"
         )
     }
 }
