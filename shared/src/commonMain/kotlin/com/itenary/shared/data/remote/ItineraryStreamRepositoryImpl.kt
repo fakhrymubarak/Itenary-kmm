@@ -22,7 +22,7 @@ class ItineraryStreamRepositoryImpl(
     private val baseUrl: String,
 ) : ItineraryStreamRepository {
 
-    override suspend fun streamItineraryGeneration(
+    override fun streamItineraryGeneration(
         request: ItineraryRequest,
     ): Flow<StreamingEvent> = flow {
         try {

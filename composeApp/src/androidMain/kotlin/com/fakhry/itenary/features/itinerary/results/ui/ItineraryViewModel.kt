@@ -22,6 +22,7 @@ import com.itenary.shared.util.DomainResult
 import com.itenary.shared.util.ERR_DB_INSERT_CONFLICT
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
@@ -65,6 +66,7 @@ class ItineraryViewModel(
 
             try {
                 streamItineraryUseCase(itineraryRequest).collect { event ->
+                    ensureActive()
                     if (latest.isLoading) emit { it.copy(isLoading = false, error = null) }
 
                     when (event) {
