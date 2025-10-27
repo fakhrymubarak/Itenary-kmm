@@ -24,6 +24,9 @@ interface ItineraryDao {
     @Delete
     suspend fun delete(entity: ItineraryEntity)
 
+    @Query("DELETE FROM itinerary WHERE id = :id")
+    suspend fun delete(id: String)
+
     @Query("SELECT id FROM itinerary")
     suspend fun getAllIds(): List<String>
 }

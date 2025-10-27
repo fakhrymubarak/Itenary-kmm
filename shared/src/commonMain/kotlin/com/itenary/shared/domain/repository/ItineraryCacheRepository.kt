@@ -10,4 +10,5 @@ interface ItineraryCacheRepository {
     suspend fun overwriteItinerary(key: String, itinerary: ItineraryDomain): DomainResult<Boolean>
     suspend fun getSavedItinerary() : DomainResult<List<SavedItineraryDomain>>
     suspend fun getSavedItineraryByKey(key: String): DomainResult<SavedItineraryDomain>
+    suspend fun deleteItinerary(key: String): DomainResult<Boolean>
 }
