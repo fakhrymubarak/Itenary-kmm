@@ -71,6 +71,52 @@ class HistoryResultsViewModel(
         }
     }
 
+    fun deleteItinerary(key: String) {
+        viewModelScope.launch(dispatcherProvider.io) {
+            val currentState = _state.value
+            val initialIndex = currentState.itineraries.indexOfFirst { it.key == key }
+            if (initialIndex == -1) return@launch
+            val removedItem = currentState.itineraries[initialIndex]
+            _state.update { state ->
+                val updatedList = state.itineraries.toMutableList().apply {
+                    val removeIndex = indexOfFirst { it.key == key }
+                    if (removeIndex != -1) removeAt(removeIndex)
+                }
+                state.copy(itineraries = updatedList, error = null)
+            }
+
+            when (val result = cacheRepo.deleteItinerary(key)) {
+                is DomainResult.Success -> Unit
+                is DomainResult.Error -> {
+                    restoreItem(initialIndex, removedItem)
+                    _state.update {
+                        it.copy(
+                            error = result.message ?: "Unable to delete itinerary"
+                        )
+                    }
+                }
+
+                is DomainResult.NetworkError -> {
+                    restoreItem(initialIndex, removedItem)
+                    _state.update {
+                        it.copy(error = "Network error while deleting itinerary")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun restoreItem(index: Int, item: HistoryItineraryUiModel) {
+        _state.update { state ->
+            if (state.itineraries.any { it.key == item.key }) return@update state
+            val restored = state.itineraries.toMutableList().apply {
+                val insertIndex = index.coerceAtMost(size)
+                add(insertIndex, item)
+            }
+            state.copy(itineraries = restored)
+        }
+    }
+
     private fun SavedItineraryDomain.toUiModel(): HistoryItineraryUiModel {
         return HistoryItineraryUiModel(
             key = key, title = key.formatKeyToTitle(), totalDays = "${itinerary.days.size} Days"

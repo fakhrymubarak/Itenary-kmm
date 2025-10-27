@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,12 +27,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -109,6 +114,7 @@ fun HistoryResultsScreen(
                 else -> HistoryItineraryList(
                     itineraries = state.itineraries,
                     onItinerarySelected = onItinerarySelected,
+                    onItineraryDeleted = viewModel::deleteItinerary,
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -135,6 +141,7 @@ private fun HistoryLoadingState() {
 private fun HistoryItineraryList(
     itineraries: List<HistoryItineraryUiModel>,
     onItinerarySelected: (String) -> Unit,
+    onItineraryDeleted: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -142,12 +149,75 @@ private fun HistoryItineraryList(
         contentPadding = PaddingValues(top = Spacing.md, bottom = Spacing.xxl),
         verticalArrangement = Arrangement.spacedBy(Spacing.lg)
     ) {
-        items(itineraries) { itinerary ->
-            HistoryItineraryCard(
+        items(
+            items = itineraries,
+            key = { itinerary -> itinerary.key }
+        ) { itinerary ->
+            HistoryItineraryDismissibleCard(
                 itinerary = itinerary,
-                onClick = { onItinerarySelected(itinerary.key) }
+                onClick = { onItinerarySelected(itinerary.key) },
+                onDelete = { onItineraryDeleted(itinerary.key) }
             )
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HistoryItineraryDismissibleCard(
+    itinerary: HistoryItineraryUiModel,
+    onClick: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    val dismissState = rememberSwipeToDismissBoxState(
+        confirmValueChange = { value ->
+            if (value == SwipeToDismissBoxValue.EndToStart) {
+                onDelete()
+                true
+            } else {
+                false
+            }
+        },
+        positionalThreshold = { distance -> distance * 0.5f }
+    )
+
+    SwipeToDismissBox(
+        state = dismissState,
+        enableDismissFromStartToEnd = false,
+        modifier = Modifier.fillMaxWidth(),
+        backgroundContent = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(vertical = Spacing.sm / 2)
+                    .clip(MaterialTheme.shapes.large)
+                    .background(MaterialTheme.colorScheme.errorContainer)
+                    .padding(horizontal = Spacing.lg),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                    Text(
+                        text = "Delete",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+            }
+        }
+    ) {
+        HistoryItineraryCard(
+            itinerary = itinerary,
+            onClick = onClick
+        )
     }
 }
 
