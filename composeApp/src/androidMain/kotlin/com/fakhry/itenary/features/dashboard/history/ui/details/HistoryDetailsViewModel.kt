@@ -7,7 +7,7 @@ import com.fakhry.itenary.features.dashboard.history.utils.formatKeyToTitle
 import com.fakhry.itenary.features.itinerary.results.model.StreamingDayUiModel
 import com.fakhry.itenary.features.itinerary.results.model.toUiModel
 import com.itenary.shared.domain.model.SavedItineraryDomain
-import com.itenary.shared.domain.repository.ItineraryStreamRepository
+import com.itenary.shared.domain.repository.ItineraryCacheRepository
 import com.itenary.shared.util.DispatcherProvider
 import com.itenary.shared.util.DomainResult
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HistoryDetailsViewModel(
-    private val repository: ItineraryStreamRepository,
+    private val cacheRepo: ItineraryCacheRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val key: String,
 ) : ViewModel() {
@@ -32,7 +32,7 @@ class HistoryDetailsViewModel(
     fun loadItinerary() {
         viewModelScope.launch(dispatcherProvider.io) {
             _state.update { it.copy(isLoading = true, error = null) }
-            when (val result = repository.getSavedItineraryByKey(key)) {
+            when (val result = cacheRepo.getSavedItineraryByKey(key)) {
                 is DomainResult.Success -> _state.update { result.data.toUiState() }
                 is DomainResult.Error -> _state.update {
                     it.copy(isLoading = false, error = result.message ?: "Unable to load itinerary details")

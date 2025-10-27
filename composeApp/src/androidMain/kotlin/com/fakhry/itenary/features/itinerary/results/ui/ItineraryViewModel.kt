@@ -15,7 +15,7 @@ import com.itenary.shared.domain.model.PriceDomain
 import com.itenary.shared.domain.model.StreamingEvent
 import com.itenary.shared.domain.model.TimelineItemDomain
 import com.itenary.shared.domain.model.TravelFromPrevDomain
-import com.itenary.shared.domain.repository.ItineraryStreamRepository
+import com.itenary.shared.domain.repository.ItineraryCacheRepository
 import com.itenary.shared.domain.usecase.StreamItineraryUseCase
 import com.itenary.shared.util.DispatcherProvider
 import com.itenary.shared.util.DomainResult
@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 class ItineraryViewModel(
     private val streamItineraryUseCase: StreamItineraryUseCase,
     private val dispatcher: DispatcherProvider,
-    private val itineraryRepository: ItineraryStreamRepository,
+    private val cacheRepo: ItineraryCacheRepository,
 ) : ViewModel() {
 
     // Non-conflated stream of UI states
@@ -131,7 +131,7 @@ class ItineraryViewModel(
         viewModelScope.launch(dispatcher.io) {
 
             val key = place.mapToKey()
-            when (val result = itineraryRepository.cacheItinerary(key, domain)) {
+            when (val result = cacheRepo.cacheItinerary(key, domain)) {
                 is DomainResult.Success -> emit {
                     it.copy(saveSuccess = true, saveError = null, saveConflict = false)
                 }
@@ -170,7 +170,7 @@ class ItineraryViewModel(
         val domain = currentItineraryDomain() ?: return
         viewModelScope.launch(dispatcher.io) {
             val key = place.mapToKey()
-            when (val result = itineraryRepository.overwriteItinerary(key, domain)) {
+            when (val result = cacheRepo.overwriteItinerary(key, domain)) {
                 is DomainResult.Success -> emit {
                     it.copy(saveSuccess = true, saveConflict = false, saveError = null)
                 }
@@ -190,7 +190,7 @@ class ItineraryViewModel(
         val domain = currentItineraryDomain() ?: return
         viewModelScope.launch(dispatcher.io) {
             val key = place.mapToKey()
-            when (val result = itineraryRepository.cacheItineraryCopy(key, domain)) {
+            when (val result = cacheRepo.cacheItineraryCopy(key, domain)) {
                 is DomainResult.Success -> emit {
                     it.copy(saveSuccess = true, saveConflict = false, saveError = null)
                 }

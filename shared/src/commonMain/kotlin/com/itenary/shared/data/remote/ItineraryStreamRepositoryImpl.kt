@@ -1,16 +1,10 @@
 package com.itenary.shared.data.remote
 
-import com.itenary.shared.data.database.ItineraryDao
-import com.itenary.shared.data.database.ItineraryEntity
 import com.itenary.shared.data.mappers.SSEEventMapper
 import com.itenary.shared.data.mappers.toDto
-import com.itenary.shared.domain.model.ItineraryDomain
 import com.itenary.shared.domain.model.ItineraryRequest
-import com.itenary.shared.domain.model.SavedItineraryDomain
 import com.itenary.shared.domain.model.StreamingEvent
 import com.itenary.shared.domain.repository.ItineraryStreamRepository
-import com.itenary.shared.util.DomainResult
-import com.itenary.shared.util.ERR_DB_INSERT_CONFLICT
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.sse.sse
 import io.ktor.client.request.setBody
@@ -18,7 +12,6 @@ import io.ktor.client.request.url
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -27,7 +20,6 @@ class ItineraryStreamRepositoryImpl(
     private val httpClient: HttpClient,
     private val sseEventMapper: SSEEventMapper,
     private val baseUrl: String,
-    private val itineraryDao: ItineraryDao,
 ) : ItineraryStreamRepository {
 
     override suspend fun streamItineraryGeneration(
@@ -50,102 +42,5 @@ class ItineraryStreamRepositoryImpl(
             emit(StreamingEvent.Error("Streaming failed: ${e.message}"))
         }
     }
-
-    override suspend fun cacheItinerary(key: String, itinerary: ItineraryDomain): DomainResult<Boolean> =
-        try {
-            val id = itineraryDao.insert(ItineraryEntity(id = key, itinerary = itinerary))
-            if (id > 0) {
-                DomainResult.Success(true)
-            } else if (id == -1L) {
-                DomainResult.Error("Itinerary already exists", ERR_DB_INSERT_CONFLICT)
-            } else {
-                DomainResult.Error("Failed to cache itinerary")
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            DomainResult.Error(message = "DB error: ${e.message}")
-        }
-
-    override suspend fun cacheItineraryCopy(
-        baseKey: String,
-        itinerary: ItineraryDomain,
-    ): DomainResult<Boolean> =
-        try {
-            val existingIds = itineraryDao.getAllIds().toSet()
-            val copyKey = generateCopyKey(baseKey, existingIds)
-            val id = itineraryDao.insert(ItineraryEntity(id = copyKey, itinerary = itinerary))
-            if (id != -1L) {
-                DomainResult.Success(true)
-            } else {
-                DomainResult.Error("Failed to cache itinerary copy")
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            DomainResult.Error(message = "DB error: ${e.message}")
-        }
-
-    override suspend fun overwriteItinerary(
-        key: String,
-        itinerary: ItineraryDomain,
-    ): DomainResult<Boolean> =
-        try {
-            itineraryDao.upsert(ItineraryEntity(id = key, itinerary = itinerary))
-            DomainResult.Success(true)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            DomainResult.Error(message = "DB error: ${e.message}")
-        }
-
-
-    override suspend fun getSavedItinerary(): DomainResult<List<SavedItineraryDomain>> =
-        try {
-            val cached = itineraryDao.getAll().map { entity ->
-                SavedItineraryDomain(
-                    key = entity.id,
-                    itinerary = entity.itinerary
-                )
-            }
-            if (cached.isNotEmpty()) {
-                DomainResult.Success(cached)
-            } else {
-                DomainResult.Error("No saved itinerary found")
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            DomainResult.Error(message = "DB error: ${e.message}")
-        }
-
-    override suspend fun getSavedItineraryByKey(key: String): DomainResult<SavedItineraryDomain> =
-        try {
-            val entity = itineraryDao.getByKey(key)
-            if (entity != null) {
-                DomainResult.Success(
-                    SavedItineraryDomain(
-                        key = entity.id,
-                        itinerary = entity.itinerary
-                    )
-                )
-            } else {
-                DomainResult.Error("Itinerary not found")
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            DomainResult.Error(message = "DB error: ${e.message}")
-        }
-
-    private fun generateCopyKey(baseKey: String, existingIds: Set<String>): String {
-        val base = "${baseKey}_copy"
-        if (base !in existingIds) return base
-        var index = 2
-        while (true) {
-            val candidate = "${base}_$index"
-            if (candidate !in existingIds) return candidate
-            index++
-        }
-    }
 }
+

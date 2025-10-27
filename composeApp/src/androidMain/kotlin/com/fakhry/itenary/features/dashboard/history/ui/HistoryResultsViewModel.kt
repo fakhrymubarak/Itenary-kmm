@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fakhry.itenary.features.dashboard.history.utils.formatKeyToTitle
 import com.itenary.shared.domain.model.SavedItineraryDomain
-import com.itenary.shared.domain.repository.ItineraryStreamRepository
+import com.itenary.shared.domain.repository.ItineraryCacheRepository
 import com.itenary.shared.util.DispatcherProvider
 import com.itenary.shared.util.DomainResult
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +26,7 @@ data class HistoryItineraryUiModel(
 )
 
 class HistoryResultsViewModel(
-    private val repository: ItineraryStreamRepository,
+    private val cacheRepo: ItineraryCacheRepository,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
@@ -40,7 +40,7 @@ class HistoryResultsViewModel(
     fun loadCachedItineraries() {
         viewModelScope.launch(dispatcherProvider.io) {
             _state.update { it.copy(isLoading = true, error = null) }
-            when (val result = repository.getSavedItinerary()) {
+            when (val result = cacheRepo.getSavedItinerary()) {
                 is DomainResult.Success -> {
                     val itineraries = result.data.mapIndexed { index, saved -> saved.toUiModel() }
                     _state.update {
