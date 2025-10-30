@@ -6,12 +6,13 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
-        compilerOptions { jvmTarget.set(JvmTarget.JVM_11) }
+        compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
     }
 
     sourceSets {
@@ -22,28 +23,35 @@ kotlin {
             implementation(libs.koin.androidx.compose)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.coil.compose)
-            implementation("org.orbit-mvi:orbit-viewmodel:6.1.0")
-            implementation("org.orbit-mvi:orbit-compose:6.1.0")
+            implementation(libs.orbit.viewmodel)
+            implementation(libs.orbit.compose)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.androidx.material.icons.extended)
+            implementation(libs.shimmer)
+            implementation(libs.androidx.lifecycle.viewmodelCompose)
+            implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.androidx.navigation.compose)
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+        }
+        androidUnitTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.koin.core)
+            implementation(libs.mockk)
+            implementation(libs.slf4j.simple)
         }
         commonMain.dependencies {
+            implementation(projects.shared)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
-            implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(libs.androidx.navigation.compose)
-            implementation(projects.shared)
+
         }
-        commonTest.dependencies { implementation(libs.kotlin.test) }
-        androidUnitTest.dependencies {
+        commonTest.dependencies {
             implementation(libs.kotlin.test)
-            implementation(libs.kotlinx.coroutines.test)
-            implementation(libs.koin.core)
-            implementation("io.mockk:mockk:1.13.8")
-            implementation("org.slf4j:slf4j-simple:1.7.36")
         }
     }
 }
@@ -68,9 +76,12 @@ android {
     }
     packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
     buildTypes { getByName("release") { isMinifyEnabled = false } }
+    buildFeatures {
+        buildConfig = true
+    }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 

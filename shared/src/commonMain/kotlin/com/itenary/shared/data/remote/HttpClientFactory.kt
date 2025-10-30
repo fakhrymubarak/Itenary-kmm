@@ -1,14 +1,15 @@
 package com.itenary.shared.data.remote
-
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngineFactory
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.sse.SSE
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import kotlin.time.Duration.Companion.days
 
 class HttpClientFactory(
     private val enableLogging: Boolean = false,
@@ -21,13 +22,18 @@ class HttpClientFactory(
                         ignoreUnknownKeys = true
                         explicitNulls = false
                         isLenient = true
-                    })
+                    }
+                )
             }
+            install(SSE)
             install(HttpTimeout) {
                 connectTimeoutMillis = 15_000
                 requestTimeoutMillis = 30_000
                 socketTimeoutMillis = 30_000
             }
+            // Platform-specific inspector (Android only). No-op on iOS.
+            installInspektor(this)
+
             if (enableLogging) {
                 install(Logging) {
                     logger = object : Logger {
@@ -45,5 +51,4 @@ class HttpClientFactory(
 interface HttpClientEngineProvider {
     fun provide(): HttpClientEngineFactory<*>
 }
-
 
